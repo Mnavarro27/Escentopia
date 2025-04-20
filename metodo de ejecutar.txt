@@ -1,0 +1,11 @@
+http://localhost:5000/index.html
+
+http://localhost:5000/login.html
+
+http://localhost:5000/manifest.json
+
+http://localhost:5000/sw.js
+
+API: http://localhost:5000/productos
+
+http://localhost:5000/debug.html

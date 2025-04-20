@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambiar Contraseña - Escentopia</title>
+  <link rel="stylesheet" href="/static/css/styleslogin.css">
+  <link rel="manifest" href="/manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos mejorados */
+    :root {
+      --primary-color: #4CAF50;
+      --primary-dark: #3e8e41;
+      --accent-color: #FF9800;
+      --error-color: #e74c3c;
+      --success-color: #27ae60;
+      --text-color: #333;
+      --bg-color: #f5f5f5;
+      --card-bg: white;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .login-page {
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .login-container {
+      background-color: var(--card-bg);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.8s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    h2 {
+      color: var(--text-color);
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--text-color);
+      background-color: #f9f9f9;
+      transition: all 0.3s;
+      box-sizing: border-box;
+    }
+    
+    input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      outline: none;
+      background-color: white;
+    }
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .password-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #777;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      margin: 0;
+      width: auto;
+    }
+    
+    .toggle-password:hover {
+      color: var(--primary-color);
+    }
+    
+    #passwordRequirements {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    #passwordRequirements p {
+      margin: 8px 0;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .valid {
+      color: var(--success-color);
+    }
+    
+    .invalid {
+      color: var(--error-color);
+    }
+    
+    #mensaje {
+      color: var(--error-color);
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 4px solid var(--error-color);
+      display: none;
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .volver {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .volver a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .volver a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-container">
+      <h2>Cambiar Contraseña</h2>
+
+      <input type="hidden" id="identificador"> <!-- Para almacenar email o username -->
+
+      <label for="password">Nueva Contraseña:</label>
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Ingresa tu nueva contraseña" required>
+        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+      </div>
+
+      <div id="passwordRequirements">
+        <p id="length" class="invalid">❌ Mínimo 8 caracteres</p>
+        <p id="uppercase" class="invalid">❌ Al menos una letra mayúscula</p>
+        <p id="lowercase" class="invalid">❌ Al menos una letra minúscula</p>
+        <p id="number" class="invalid">❌ Al menos un número</p>
+        <p id="special" class="invalid">❌ Al menos un carácter especial (@$!%*?&)</p>
+      </div>
+
+      <label for="confirmPassword">Confirmar Contraseña:</label>
+      <div class="password-container">
+        <input type="password" id="confirmPassword" placeholder="Confirma tu nueva contraseña" required>
+        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</button>
+      </div>
+
+      <button id="cambiar-contrasena">Actualizar Contraseña</button>
+
+      <p id="mensaje"></p>
+      <p class="volver"><a href="login.html">Volver al Login</a></p>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get("email");
+      const username = urlParams.get("username");
+      const identificadorInput = document.getElementById("identificador");
+
+      // Determinar si el usuario llegó por correo o por preguntas de seguridad
+      let identificador;
+      if (email) {
+        identificador = email;
+        identificadorInput.value = email;
+      } else if (username) {
+        identificador = username;
+        identificadorInput.value = username;
+      } else {
+        alert("Error: No se proporcionó un identificador válido.");
+        window.location.href = "recuperar.html";
+        return;
+      }
+
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+      const mensajeEl = document.getElementById("mensaje");
+
+      // Validaciones en tiempo real de la contraseña
+      const lengthCheck = document.getElementById("length");
+      const uppercaseCheck = document.getElementById("uppercase");
+      const lowercaseCheck = document.getElementById("lowercase");
+      const numberCheck = document.getElementById("number");
+      const specialCheck = document.getElementById("special");
+
+      passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+
+        // Expresiones regulares para validar cada criterio
+        const lengthValid = password.length >= 8;
+        const uppercaseValid = /[A-Z]/.test(password);
+        const lowercaseValid = /[a-z]/.test(password);
+        const numberValid = /\d/.test(password);
+        const specialValid = /[@$!%*?&]/.test(password);
+
+        updateValidationStatus(lengthCheck, lengthValid);
+        updateValidationStatus(uppercaseCheck, uppercaseValid);
+        updateValidationStatus(lowercaseCheck, lowercaseValid);
+        updateValidationStatus(numberCheck, numberValid);
+        updateValidationStatus(specialCheck, specialValid);
+      });
+
+      function updateValidationStatus(element, isValid) {
+        if (isValid) {
+          element.classList.remove("invalid");
+          element.classList.add("valid");
+          element.innerHTML = element.innerHTML.replace("❌", "✅");
+        } else {
+          element.classList.remove("valid");
+          element.classList.add("invalid");
+          element.innerHTML = element.innerHTML.replace("✅", "❌");
+        }
+      }
+
+      // Manejar el envío de la nueva contraseña
+      document.getElementById("cambiar-contrasena").addEventListener("click", async () => {
+        const password = passwordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
+
+        if (!password || !confirmPassword) {
+          mostrarMensaje("Por favor, completa todos los campos.");
+          return;
+        }
+
+        // Validar que las contraseñas coincidan
+        if (password !== confirmPassword) {
+          mostrarMensaje("Las contraseñas no coinciden.");
+          return;
+        }
+
+        // Validar que la contraseña cumpla con los requisitos
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordPattern.test(password)) {
+          mostrarMensaje("La contraseña no cumple con los requisitos.");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/recuperacion/cambiar-contrasena", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identificador, nuevaPassword: password })
+        });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert("Contraseña actualizada correctamente.");
+            window.location.href = "login.html";
+          } else {
+            mostrarMensaje(data.error || "Error al actualizar la contraseña.");
+          }
+        } catch (error) {
+          console.error("Error de conexión:", error);
+          mostrarMensaje("Error de conexión con el servidor.");
+        }
+      });
+
+      function mostrarMensaje(mensaje) {
+        mensajeEl.textContent = mensaje;
+        mensajeEl.style.display = "block";
+        
+        // Aplicar animación de shake
+        mensajeEl.style.animation = "none";
+        setTimeout(() => {
+          mensajeEl.style.animation = "shake 0.5s ease-in-out";
+        }, 10);
+      }
+    });
+
+    // Función para mostrar/ocultar la contraseña
+    function togglePassword(inputId) {
+      const passwordInput = document.getElementById(inputId);
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depuración - Escentopia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+    }
+    .test-section {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .test-button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Página de Depuración - Escentopia</h1>
+  
+  <div class="test-section">
+    <h2>Prueba de Funciones Globales</h2>
+    <p>Esta sección prueba si las funciones globales están disponibles.</p>
+    
+    <button class="test-button" onclick="testFuncionesGlobales()">Probar Funciones Globales</button>
+    <div id="global-functions-result" class="result"></div>
+    
+    <script>
+      function testFuncionesGlobales() {
+        const resultDiv = document.getElementById('global-functions-result');
+        
+        try {
+          const agregarAlCarritoExists = typeof agregarAlCarrito === 'function';
+          const mostrarDetallesExists = typeof mostrarDetalles === 'function';
+          
+          if (agregarAlCarritoExists && mostrarDetallesExists) {
+            resultDiv.innerHTML = '<span class="success">✓ Ambas funciones están disponibles globalmente.</span>';
+          } else {
+            resultDiv.innerHTML = '<span class="error">✗ Problema: ' + 
+              (!agregarAlCarritoExists ? 'agregarAlCarrito no está definida. ' : '') +
+              (!mostrarDetallesExists ? 'mostrarDetalles no está definida. ' : '') + '</span>';
+          }
+        } catch (error) {
+          resultDiv.innerHTML = '<span class="error">✗ Error al probar funciones: ' + error.message + '</span>';
+        }
+      }
+    </script>
+  </div>
+  
+  <div class="test-section">
+    <h2>Prueba de Llamada Directa</h2>
+    <p>Esta sección prueba llamar directamente a las funciones.</p>
+    
+    <button class="test-button" onclick="testLlamadaDirecta()">Probar Llamada Directa</button>
+    <div id="direct-call-result" class="result"></div>
+    
+    <script>
+      function testLlamadaDirecta() {
+        const resultDiv = document.getElementById('direct-call-result');
+        
+        try {
+          // Definir funciones de respaldo por si no existen globalmente
+          const agregarAlCarritoFallback = window.agregarAlCarrito || function() { 
+            return "Función no disponible"; 
+          };
+          
+          const mostrarDetallesFallback = window.mostrarDetalles || function() { 
+            return "Función no disponible"; 
+          };
+          
+          // Intentar llamar a las funciones
+          const resultAgregar = agregarAlCarritoFallback(999, "Producto de prueba", 9.99);
+          const resultMostrar = mostrarDetallesFallback(999, "Producto de prueba", 9.99, "Descripción de prueba");
+          
+          resultDiv.innerHTML = '<span class="success">✓ Llamadas realizadas. Revisa la consola para más detalles.</span>';
+        } catch (error) {
+          resultDiv.innerHTML = '<span class="error">✗ Error al llamar funciones: ' + error.message + '</span>';
+        }
+      }
+    </script>
+  </div>
+  
+  <div class="test-section">
+    <h2>Prueba de Carga de Script</h2>
+    <p>Esta sección prueba cargar las funciones desde un script externo.</p>
+    
+    <button class="test-button" id="load-script-button">Cargar Script y Probar</button>
+    <div id="script-load-result" class="result"></div>
+    
+    <script>
+      document.getElementById('load-script-button').addEventListener('click', function() {
+        const resultDiv = document.getElementById('script-load-result');
+        resultDiv.innerHTML = '<span>Cargando script...</span>';
+        
+        const script = document.createElement('script');
+        script.src = '/static/js/funciones-globales.js';
+        script.onload = function() {
+          resultDiv.innerHTML = '<span class="success">✓ Script cargado correctamente.</span>';
+          
+          // Probar funciones después de cargar
+          setTimeout(function() {
+            try {
+              const agregarAlCarritoExists = typeof agregarAlCarrito === 'function';
+              const mostrarDetallesExists = typeof mostrarDetalles === 'function';
+              
+              if (agregarAlCarritoExists && mostrarDetallesExists) {
+                resultDiv.innerHTML += '<br><span class="success">✓ Funciones disponibles después de cargar script.</span>';
+              } else {
+                resultDiv.innerHTML += '<br><span class="error">✗ Funciones no disponibles después de cargar script.</span>';
+              }
+            } catch (error) {
+              resultDiv.innerHTML += '<br><span class="error">✗ Error al probar después de cargar: ' + error.message + '</span>';
+            }
+          }, 500);
+        };
+        
+        script.onerror = function() {
+          resultDiv.innerHTML = '<span class="error">✗ Error al cargar el script.</span>';
+        };
+        
+        document.head.appendChild(script);
+      });
+    </script>
+  </div>
+  
+  <div class="test-section">
+    <h2>Volver a la página principal</h2>
+    <a href="/index.html" class="test-button">Volver a Inicio</a>
+  </div>
+
+  <!-- Definir funciones globales como respaldo -->
+  <script>
+    // Solo definir si no existen ya
+    if (typeof window.agregarAlCarrito !== 'function') {
+      window.agregarAlCarrito = function(id, nombre, precio) {
+        console.log("agregarAlCarrito de respaldo llamado:", id, nombre, precio);
+        alert("Función agregarAlCarrito de respaldo ejecutada");
+      };
+    }
+    
+    if (typeof window.mostrarDetalles !== 'function') {
+      window.mostrarDetalles = function(id, nombre, precio, descripcion) {
+        console.log("mostrarDetalles de respaldo llamado:", id, nombre, precio, descripcion);
+        alert("Función mostrarDetalles de respaldo ejecutada");
+      };
+    }
+  </script>
+</body>
+</html>

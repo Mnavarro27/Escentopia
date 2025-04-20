@@ -1,0 +1,49 @@
+consumo aplis 
+
+1. Ministerio de Salud – Componentes
+✅ POST (Agregar componente)
+URL: http://localhost:5000/api/servicios/salud/componentes
+Método: POST
+Cuerpo (JSON):
+{
+  "nombre": "Alcohol",
+  "permitido": false
+}
+✅ GET (Consultar si el componente está permitido)
+http://localhost:5000/api/servicios/salud/componente/Alcohol
+Método: GET
+
+/*--------------------------------------------------------------------------------------*/
+
+✅ PUBLICAR (Registrador zona disponible)
+URL: http://localhost:5000/api/servicios/transporte
+Método: POST
+Cuerpo (JSON):
+
+{
+  "provincia": "San José",
+  "canton": "Escazú",
+  "distrito": "Guachipelín",
+  "disponible": true
+}
+
+✅ OBTENER (Consultar disponibilidad)
+URL:
+
+http://localhost:5000/api/servicios/transporte/disponibilidad?provincia=San%20José&canton=Escazú&distrito=Guachipelín
+Método: GET
+
+/*--------------------------------------------------------------------------------------*/
+
+✅ POST (Registrador cantidad por tipo)
+URL: http://localhost:5000/api/servicios/recipientes
+Método: POST
+Cuerpo (JSON):
+
+{
+  "tipo": "vidrio",
+  "cantidad": 50
+}
+✅ GET (Consultar stock de un tipo)
+URL: http://localhost:5000/api/servicios/recipientes/vidrio
+Método: GET

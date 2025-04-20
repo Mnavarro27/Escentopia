@@ -1,0 +1,25 @@
+Control de cambios arquitectónico 
+
+1. Servicios internos ( aplis)
+Toda cosulta ala base de datos se va a realizar mediante las aplis y solo por las api 
+
+Solo puede existir una apli con diferentes métodos para vas las diferentes consultar u escritura en base 
+
+Este apli tiene que tener un lenguaje de programación deferente en el cual está el código ( hacerlo en Python ) 
+
+2. De todos los servicios ( api ) 5 tienen que ser posible que un tercero lo consuma 
+
+3. Consumir un api productivo real ( banco central tipo de cambio compra y venta a tiempo real ) 
+Implementarlo en la página carrito.html 
+
+4. 4. Simular servicios externos ( pagos ) 
+simular una entidad bancaria la cual va a tener un api externo el cual va a consular de SQL server si la tabla tarjeta con la columnas fecha de vencimiento y salgo disponible si se encuentra activa y si tiene el saldo disponible para realizar el pago 
+
+
+5. Implementar api necesario para poder implementar PayPal a mi código 
+
+6. Simular servicio externo ( api )
+simular un sistema de registro civil en donde hay un api la cual al consumirlo y colocar el número de cédula lague los datos del usuario 
+
+7. 3 servicios externos ( api )  que mi app valla a necesitar 
+Ideas ( ministerio de salud consultar componentes que pueden ser dañinos ,  servicio de transporte y consulta a proveedores recipientes )

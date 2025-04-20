@@ -1,0 +1,39 @@
+comando para revisar la auditora de ingreso 
+
+SELECT * FROM Auditoria_Accesos ORDER BY fecha DESC;
+
+por usuario 
+
+SELECT * FROM Auditoria_Accesos WHERE username = 'usuario123' ORDER BY fecha DESC;
+
+
+por intentos fallidos 
+SELECT * FROM Auditoria_Accesos WHERE exito = 0 ORDER BY fecha DESC;
+
+
+
+CREATE TABLE Auditoria_Accesos (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    username NVARCHAR(255),
+    fecha DATETIME DEFAULT GETDATE(),
+    ip NVARCHAR(50),
+    exito BIT,  -- 1 = éxito, 0 = fallo
+    motivo NVARCHAR(255) -- Mensaje del intento (ejemplo: "Contraseña incorrecta", "Acceso exitoso")
+);
+
+
+
+para auditoria de eventos se consulta 
+
+SELECT * FROM Auditoria_UsuariosM ORDER BY fecha DESC;
+
+CREATE TABLE Auditoria_UsuariosM (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    username NVARCHAR(255),
+    accion NVARCHAR(50),  -- "INSERT", "UPDATE", "DELETE"
+    campo_modificado NVARCHAR(255),
+    valor_anterior NVARCHAR(MAX),
+    valor_nuevo NVARCHAR(MAX),
+    fecha DATETIME DEFAULT GETDATE(),
+    ip NVARCHAR(50)
+);

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito - Escentopia</title>
+  
+  <!-- IMPORTANTE: DEFINIR FUNCIONES GLOBALES ANTES DE CUALQUIER OTRO CÓDIGO -->
+  <script>
+    // Definir funciones globalmente antes de cualquier otro código
+    function agregarAlCarrito(id, nombre, precio) {
+      console.log("agregarAlCarrito llamado con:", id, nombre, precio);
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const existe = carrito.find(item => item.id === id);
+      if (existe) {
+        existe.cantidad++;
+      } else {
+        carrito.push({ id, nombre, precio, cantidad: 1 });
+      }
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      alert("Producto agregado al carrito!");
+    }
+
+    function mostrarDetalles(id, nombre, precio, descripcion) {
+      console.log("mostrarDetalles llamado con:", id, nombre, precio, descripcion);
+      document.getElementById("modalTitulo").innerText = nombre;
+      document.getElementById("modalPrecio").innerText = `Precio: ${precio.toFixed(2)}`;
+      document.getElementById("modalDescripcion").innerText = descripcion;
+      document.getElementById("modalDetalles").style.display = "block";
+    }
+
+    // Exponer funciones al ámbito global explícitamente
+    window.agregarAlCarrito = agregarAlCarrito;
+    window.mostrarDetalles = mostrarDetalles;
+  </script>
+  
+  <!-- Estilos y manifest -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Material Icons y Google Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Nav responsivo -->
+  <script defer src="/static/js/nav.js"></script>
+
+  <!-- Estilos específicos para el carrito -->
+  <style>
+    .cart-container {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+    
+    .cart-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    
+    .item-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 15px;
+    }
+    
+    .item-details {
+      flex-grow: 1;
+    }
+    
+    .item-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .item-price {
+      color: #666;
+      font-size: 0.9em;
+    }
+    
+    .item-actions {
+      display: flex;
+      align-items: center;
+    }
+    
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+    
+    .quantity-btn {
+      background-color: #f0f0f0;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    
+    .quantity-input {
+      width: 40px;
+      text-align: center;
+      border: none;
+      font-size: 16px;
+      margin: 0 10px;
+    }
+    
+    .remove-btn {
+      background-color: #ff5252;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    
+    .remove-btn i {
+      font-size: 18px;
+      margin-right: 5px;
+    }
+    
+    .cart-summary {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .summary-row.total {
+      font-weight: 700;
+      font-size: 1.2em;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    
+    .checkout-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+    
+    .checkout-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .empty-cart {
+      text-align: center;
+      padding: 40px 0;
+    }
+    
+    .empty-cart i {
+      font-size: 60px;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .empty-cart p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .continue-shopping {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #2196F3;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    
+    .continue-shopping:hover {
+      background-color: #0b7dda;
+    }
+    
+    /* Estilos para el tipo de cambio */
+    .exchange-rate-card {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .exchange-rate-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .exchange-rate-title i {
+      margin-right: 10px;
+      color: #4CAF50;
+    }
+    
+    .exchange-rate-values {
+      display: flex;
+      justify-content: space-around;
+    }
+    
+    .exchange-rate-item {
+      text-align: center;
+    }
+    
+    .exchange-label {
+      display: block;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .exchange-value {
+      font-weight: 600;
+      font-size: 1.1em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <nav class="nav-bar">
+    <button class="menu-button" id="menu-button">&#9776;</button>
+    <h1 class="logo">Escentopia</h1>
+    <div class="nav-buttons">
+      <a href="/perfil.html" class="icon-button"><i class="material-icons">person</i></a>
+      <a href="/carrito.html" class="icon-button"><i class="material-icons">shopping_cart</i></a>
+      <a href="/login.html" class="icon-button"><i class="material-icons">exit_to_app</i></a>
+    </div>
+  </nav>
+
+  <!-- Menú desplegable -->
+  <div class="menu-dropdown" id="menu-dropdown">
+    <ul>
+      <li><a href="/promociones.html">Ver Promociones</a></li>
+      <li><a href="/Informacion.html">Quiénes somos</a></li>
+    </ul>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    <h2 class="welcome-title">Tu Carrito de Compras</h2>
+    
+    <!-- Tipo de Cambio -->
+    <div class="exchange-rate-card">
+      <div class="exchange-rate-title">
+        <i class="material-icons">currency_exchange</i>
+        <span>Tipo de Cambio Actual</span>
+      </div>
+      <div class="exchange-rate-values">
+        <div class="exchange-rate-item">
+          <span class="exchange-label">Compra:</span>
+          <span class="exchange-value">₡<span id="tipoCambioCompra">Cargando...</span></span>
+        </div>
+        <div class="exchange-rate-item">
+          <span class="exchange-label">Venta:</span>
+          <span class="exchange-value">₡<span id="tipoCambioVenta">Cargando...</span></span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="cart-content">
+      <!-- El contenido del carrito se cargará dinámicamente aquí -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <!-- Sobre nosotros -->
+      <div class="footer-section about">
+        <h3>Sobre Escentopia</h3>
+        <p>Escentopia es tu destino para encontrar las mejores fragancias y aromas para tu hogar, auto y uso personal.</p>
+        <div class="social-links">
+          <a href="#"><i class="material-icons">facebook</i></a>
+          <a href="#"><i class="material-icons">alternate_email</i></a>
+          <a href="#"><i class="material-icons">photo_camera</i></a>
+        </div>
+      </div>
+      <!-- Enlaces rápidos -->
+      <div class="footer-section links">
+        <h3>Enlaces Rápidos</h3>
+        <ul>
+          <li><a href="/index.html">Inicio</a></li>
+          <li><a href="/promociones.html">Promociones</a></li>
+          <li><a href="/Informacion.html">Quiénes Somos</a></li>
+          <li><a href="/perfil.html">Mi Perfil</a></li>
+          <li><a href="/carrito.html">Carrito</a></li>
+        </ul>
+      </div>
+      <!-- Contacto -->
+      <div class="footer-section contact">
+        <h3>Contáctanos</h3>
+        <div class="contact-item"><i class="material-icons">location_on</i> San José, Costa Rica</div>
+        <div class="contact-item"><i class="material-icons">phone</i> +506 2222-3333</div>
+        <div class="contact-item"><i class="material-icons">email</i> info@escentopia.com</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Escentopia - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- Modal de confirmación para eliminar -->
+  <div id="modalConfirmacion" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Confirmar eliminación</h2>
+      <p>¿Estás seguro de que deseas eliminar este producto del carrito?</p>
+      <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        <button id="btnCancelarEliminar" style="padding: 10px 20px; background-color: #ccc; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
+        <button id="btnConfirmarEliminar" style="padding: 10px 20px; background-color: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer;">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de checkout -->
+  <div id="modalCheckout" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Finalizar Compra</h2>
+      <p>Tu pedido ha sido procesado correctamente.</p>
+      <p>Número de orden: <strong id="ordenId"></strong></p>
+      <p>Total: <strong id="ordenTotal"></strong></p>
+      <p>Recibirás un correo electrónico con los detalles de tu compra.</p>
+      <button id="btnContinuarComprando" style="display: block; width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; margin-top: 20px; cursor: pointer;">Continuar Comprando</button>
+    </div>
+  </div>
+
+  <!-- Scripts para el carrito -->
+  <script>
+    // Variables globales
+    let itemIdToRemove = null;
+    let tipoCambioCompra = 0;
+    let tipoCambioVenta = 0;
+    
+    // Función para cargar el carrito
+    function cargarCarrito() {
+      const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const cartContent = document.getElementById("cart-content");
+      
+      if (carrito.length === 0) {
+        // Mostrar mensaje de carrito vacío
+        cartContent.innerHTML = `
+          <div class="empty-cart">
+            <i class="material-icons">shopping_cart</i>
+            <p>Tu carrito está vacío</p>
+            <a href="/index.html" class="continue-shopping">Continuar Comprando</a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calcular subtotal, impuestos y total
+      const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+      const impuestos = subtotal * 0.13; // 13% de impuestos
+      const total = subtotal + impuestos;
+      
+      // Calcular total en colones si hay tipo de cambio disponible
+      let totalColones = "";
+      if (tipoCambioVenta > 0) {
+        totalColones = `<div class="summary-row">
+          <span>Total en Colones (TC Venta):</span>
+          <span>₡${(total * tipoCambioVenta).toFixed(2)}</span>
+        </div>`;
+      }
+      
+      // Construir HTML del carrito
+      let html = `
+        <div class="cart-container">
+      `;
+      
+      // Agregar cada item del carrito
+      carrito.forEach(item => {
+        html += `
+          <div class="cart-item" data-id="${item.id}">
+            <img src="/static/images/default.jpg" alt="${item.nombre}" class="item-image" onerror="this.src='/static/images/default.jpg'">
+            <div class="item-details">
+              <div class="item-name">${item.nombre}</div>
+              <div class="item-price">Precio: $${item.precio.toFixed(2)}</div>
+            </div>
+            <div class="item-actions">
+              <div class="quantity-control">
+                <button class="quantity-btn decrease" data-id="${item.id}">-</button>
+                <input type="text" class="quantity-input" value="${item.cantidad}" readonly>
+                <button class="quantity-btn increase" data-id="${item.id}">+</button>
+              </div>
+              <button class="remove-btn" data-id="${item.id}">
+                <i class="material-icons">delete</i> Eliminar
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      // Agregar resumen del carrito
+      html += `
+        </div>
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>$${subtotal.toFixed(2)}</span>
+          </div>
+          <div class="summary-row">
+            <span>Impuestos (13%):</span>
+            <span>$${impuestos.toFixed(2)}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total:</span>
+            <span>$${total.toFixed(2)}</span>
+          </div>
+          ${totalColones}
+          <button id="checkout-btn" class="checkout-btn">Proceder al Pago</button>
+        </div>
+      `;
+      
+      cartContent.innerHTML = html;
+      
+      // Agregar event listeners a los botones
+      document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+        btn.addEventListener('click', decrementarCantidad);
+      });
+      
+      document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+        btn.addEventListener('click', incrementarCantidad);
+      });
+      
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', confirmarEliminarItem);
+      });
+      
+      document.getElementById('checkout-btn').addEventListener('click', procesarCheckout);
+    }
+    
+    // Función para incrementar cantidad
+    function incrementarCantidad() {
+      const id = parseInt(this.dataset.id);
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const item = carrito.find(item => item.id === id);
+      
+      if (item) {
+        item.cantidad++;
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        cargarCarrito(); // Recargar carrito
+      }
+    }
+    
+    // Función para decrementar cantidad
+    function decrementarCantidad() {
+      const id = parseInt(this.dataset.id);
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const item = carrito.find(item => item.id === id);
+      
+      if (item && item.cantidad > 1) {
+        item.cantidad--;
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        cargarCarrito(); // Recargar carrito
+      }
+    }
+    
+    // Función para confirmar eliminación de item
+    function confirmarEliminarItem() {
+      itemIdToRemove = parseInt(this.dataset.id);
+      document.getElementById("modalConfirmacion").style.display = "block";
+    }
+    
+    // Función para eliminar item del carrito
+    function eliminarItem() {
+      if (itemIdToRemove === null) return;
+      
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      carrito = carrito.filter(item => item.id !== itemIdToRemove);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      
+      // Cerrar modal y recargar carrito
+      document.getElementById("modalConfirmacion").style.display = "none";
+      itemIdToRemove = null;
+      cargarCarrito();
+    }
+    
+    // Función para procesar el checkout
+    function procesarCheckout() {
+      const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      
+      if (carrito.length === 0) {
+        alert("Tu carrito está vacío");
+        return;
+      }
+      
+      // Calcular total
+      const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+      const impuestos = subtotal * 0.13;
+      const total = subtotal + impuestos;
+      
+      // Redirigir a la página de finalizar compra con el total
+      window.location.href = `/finalizarCompra.html?total=${total.toFixed(2)}`;
+    }
+    
+    // Función para obtener el tipo de cambio
+    async function obtenerTipoCambio() {
+      try {
+        const response = await fetch("/api/exchange-rate");
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Datos de tipo de cambio:", data);
+        
+        if (data.tipoDeCambio) {
+          // Convertir a float y formatear a 3 dígitos decimales
+          tipoCambioCompra = parseFloat(data.tipoDeCambio.compra);
+          tipoCambioVenta = parseFloat(data.tipoDeCambio.venta);
+          
+          document.getElementById("tipoCambioCompra").innerText = tipoCambioCompra.toFixed(3);
+          document.getElementById("tipoCambioVenta").innerText = tipoCambioVenta.toFixed(3);
+          
+          // Actualizar carrito para mostrar el total en colones
+          cargarCarrito();
+        } else {
+          document.getElementById("tipoCambioCompra").innerText = "No disponible";
+          document.getElementById("tipoCambioVenta").innerText = "No disponible";
+        }
+      } catch (error) {
+        console.error("Error al obtener el tipo de cambio:", error);
+        document.getElementById("tipoCambioCompra").innerText = "Error";
+        document.getElementById("tipoCambioVenta").innerText = "Error";
+      }
+    }
+    
+    // Event listeners para cerrar modales
+    document.addEventListener("DOMContentLoaded", function() {
+      // Cargar carrito al cargar la página
+      cargarCarrito();
+      
+      // Obtener tipo de cambio
+      obtenerTipoCambio();
+      
+      // Configurar event listeners para modales
+      document.querySelectorAll(".modal .close").forEach(closeBtn => {
+        closeBtn.addEventListener("click", function() {
+          this.closest(".modal").style.display = "none";
+        });
+      });
+      
+      // Botones de confirmación para eliminar
+      document.getElementById("btnCancelarEliminar").addEventListener("click", function() {
+        document.getElementById("modalConfirmacion").style.display = "none";
+        itemIdToRemove = null;
+      });
+      
+      document.getElementById("btnConfirmarEliminar").addEventListener("click", eliminarItem);
+      
+      // Botón para continuar comprando después del checkout
+      document.getElementById("btnContinuarComprando").addEventListener("click", function() {
+        document.getElementById("modalCheckout").style.display = "none";
+        window.location.href = "/index.html";
+      });
+    });
+  </script>
+
+  <!-- Service Worker PWA -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/static/sw-v2.js")
+          .then(reg => console.log("SW registrado en:", reg.scope))
+          .catch(err => console.error("Error registrando SW:", err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="/static/css/stylesuser.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <div class="registro-container">
+    <h2>Registro de Usuario</h2>
+    <form id="registro-form">
+      <fieldset>
+        <legend>Información Básica</legend>
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Nombre de Usuario:</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña:</label>
+          <div style="position: relative;">
+            <input type="password" id="password" name="password" required>
+            <button type="button" onclick="togglePassword()"
+                    style="position: absolute; right: 0; top: 0; width: auto; padding: 10px; background: none; color: #333;">
+              👁️
+            </button>
+          </div>
+          <div id="passwordRequirements">
+            <p id="length"   class="invalid">❌ Mínimo 8 caracteres</p>
+            <p id="uppercase" class="invalid">❌ Al menos una letra mayúscula</p>
+            <p id="lowercase" class="invalid">❌ Al menos una letra minúscula</p>
+            <p id="number"    class="invalid">❌ Al menos un número</p>
+            <p id="special"   class="invalid">❌ Al menos un carácter especial (@$!%*?&+-¿;:.,)</p>
+          </div>
+          <p id="passwordError" class="error-message" style="display: none;">
+            La contraseña no cumple con los requisitos.
+          </p>
+        </div>
+        <div class="form-group">
+          <label for="correo">Correo Electrónico:</label>
+          <input type="email" id="correo" name="correo" required>
+        </div>
+      </fieldset>
+      <button type="submit">Registrar</button>
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="login.html" style="color:rgb(49, 42, 197); text-decoration: none;">
+          Volver al inicio de sesión
+        </a>
+      </p>
+    </form>
+  </div>
+
+  <!-- Incluir tu script de registro desde /static/js -->
+  <script defer src="/static/js/registro.js"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+/* stylespromociones.css */
+
+/* Estilos globales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+  }
+  
+  /* Navegación */
+  .nav-bar {
+    background-color: #28367b;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-bar .logo {
+    flex: 1;
+    font-size: 24px;
+  }
+  
+  .nav-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .icon-button {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+  }
+  
+  /* Contenedor principal */
+  .container {
+    padding: 20px;
+  }
+  
+  .welcome-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Contenedor de promociones */
+  .promociones-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* Tarjeta de promoción */
+  .promo-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 15px;
+    max-width: 300px;
+    text-align: center;
+  }
+  
+  .promo-images {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .promo-image {
+    max-width: 100px;
+    border-radius: 5px;
+  }
+  
+  .promo-title {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+  
+  .promo-products,
+  .promo-price,
+  .promo-discount,
+  .promo-final-price {
+    margin: 5px 0;
+  }
+  
+  .buy-promo-button {
+    background-color: #28367b;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+  }
+  
+  .buy-promo-button:hover {
+    background-color: #1d2b5f;
+  }
+  
+  /* ===============================
+   Estilos para la Tarjeta de Promoción
+=============================== */
+.promo-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 20px auto;
+  max-width: 600px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.promo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Contenedor de imágenes en la promoción */
+.promo-images {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.promo-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Estilos para los textos y precios */
+.promo-title {
+  font-size: 22px;
+  color: #ff8c00;
+  margin-bottom: 10px;
+}
+.promo-products {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+.promo-price,
+.promo-discount,
+.promo-final-price {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Botón de compra para promoción */
+.buy-promo-button {
+  background-color: #1d2b5f;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.buy-promo-button:hover {
+  background-color: #e07b00;
+  transform: scale(1.05);
+}
+
+.cart-button { 
+  transform: translateX(-50%);
+  color: #fff; /* Color para el logo */
+
+}
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #fff; /* Color para el logo */
+  
+}
+
+.nav-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #28367b;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+.icon-button {
+  text-decoration: none;
+  color: black;
+  font-size: 28px;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+.icon-button:hover {
+  color: #007bff;
+}

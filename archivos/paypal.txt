@@ -1,0 +1,6 @@
+ingresar para ver los datos del cliente 
+
+hay un perfil ujecutivo y otro cliente  
+
+https://developer.paypal.com/dashboard/accounts
+

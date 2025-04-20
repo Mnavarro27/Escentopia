@@ -1,0 +1,8 @@
+esto borra el contenido de se encuentra en usuario para que no ingrese de una ves sin pasar por el login
+
+localStorage.removeItem("usuario");
+
+
+este comando con f12 es para revisar el contenido de usuario en localStorege
+
+console.log(localStorage.getItem("usuario"))

@@ -1,0 +1,219 @@
+/* Estilos para registro.html */
+:root {
+  --primary-color: #462fab;
+  --primary-dark: #3da2b9;
+  --accent-color: #ff9800;
+  --error-color: #e74c3c;
+  --success-color: #27ae60;
+  --text-color: #333;
+  --bg-color: #f5f5f5;
+  --card-bg: white;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /*height: 100vh;*/
+  background: url('https://i.imgur.com/wBcAVvU.jpeg') no-repeat center top;
+  background-size: cover;
+}
+
+.registro-container {
+  background-color: var(--card-bg);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 600px;
+  animation: fadeIn 0.8s ease-out;
+  position: relative;
+  /*overflow: hidden;*/
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.registro-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+h2 {
+  color: var(--text-color);
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+}
+
+fieldset {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  border-left: 4px solid var(--primary-color);
+}
+
+legend {
+  font-weight: 600;
+  padding: 0 15px;
+  color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--text-color);
+  background-color: white;
+  transition: all 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  margin: 0;
+  width: auto;
+}
+
+.toggle-password:hover {
+  color: var(--primary-color);
+}
+
+#passwordRequirements {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border-left: 4px solid var(--primary-color);
+}
+
+#passwordRequirements p {
+  margin: 8px 0;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.valid {
+  color: var(--success-color);
+}
+
+.invalid {
+  color: var(--error-color);
+}
+
+.error-message {
+  color: var(--error-color);
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.volver {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.volver a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.volver a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .registro-container {
+    padding: 20px;         /* ↓Reducido de 25px a 20px */
+    max-width: 90%;        /* ocupa el 90% del ancho móvil */
+  }
+}

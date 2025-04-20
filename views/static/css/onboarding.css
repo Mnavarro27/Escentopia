@@ -1,0 +1,74 @@
+
+/* Estilos básicos en caso de que el CSS externo no cargue */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f5f5;
+  height: 100vh;
+  overflow: hidden;
+}
+.onboarding {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.onboarding-content {
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.onboarding-step {
+  display: none;
+}
+.onboarding-step.active {
+  display: block;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+h2 {
+  color: #4CAF50;
+  margin-top: 0;
+}
+p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+}
+.onboarding-next, #onboarding-finish {
+  background-color: #4CAF50;
+  color: white;
+}
+.onboarding-next:hover, #onboarding-finish:hover {
+  background-color: #45a049;
+}
+.onboarding-skip {
+  background-color: transparent;
+  color: #999;
+}
+.onboarding-skip:hover {
+  color: #666;
+}

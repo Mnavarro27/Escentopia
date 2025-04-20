@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Escentopia</title>
+  
+  <!-- Estilos y manifest -->
+  <link rel="stylesheet" href="/static/css/styleslogin.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Material Icons y Google Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    /* Estilos adicionales para el botón de mostrar contraseña */
+    .password-container {
+      position: relative;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #777;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      width: auto;
+    }
+    
+    .toggle-password:hover {
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    <h2 class="welcome-title">Accede a tu cuenta</h2>
+    
+    <div class="auth-container">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">Iniciar Sesión</div>
+        <div class="auth-tab" data-tab="register">Registrarse</div>
+      </div>
+      
+      <!-- Formulario de Login -->
+      <form id="login-form" class="auth-form active">
+        <div class="form-group">
+          <label for="login-username">Nombre de usuario</label>
+          <input type="text" id="login-username" class="form-control" required>
+          <div id="login-username-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <div class="password-container">
+            <input type="password" id="login-password" class="form-control" required>
+            <button type="button" class="toggle-password" onclick="toggleLoginPassword()">👁️</button>
+          </div>
+          <div id="login-password-error" class="error-message"></div>
+        </div>
+        
+        <button type="submit" class="auth-btn" id="login-button">Iniciar Sesión</button>
+        
+        <div class="auth-links">
+          <a href="/recuperar.html" id="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
+        
+        <div id="login-error" class="error-message" style="margin-top: 20px; text-align: center;"></div>
+        <div id="login-success" class="success-message" style="margin-top: 20px; text-align: center;"></div>
+      </form>
+      
+      <!-- Formulario de Registro -->
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-username">Nombre de usuario</label>
+          <input type="text" id="register-username" class="form-control" required>
+          <div id="register-username-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-name">Nombre completo</label>
+          <input type="text" id="register-name" class="form-control" required>
+          <div id="register-name-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-email">Correo electrónico</label>
+          <input type="email" id="register-email" class="form-control" required>
+          <div id="register-email-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <div class="password-container">
+            <input type="password" id="register-password" class="form-control" required>
+            <button type="button" class="toggle-password" onclick="toggleRegisterPassword()">👁️</button>
+          </div>
+          <div id="register-password-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-confirm-password">Confirmar contraseña</label>
+          <div class="password-container">
+            <input type="password" id="register-confirm-password" class="form-control" required>
+            <button type="button" class="toggle-password" onclick="toggleConfirmPassword()">👁️</button>
+          </div>
+          <div id="register-confirm-password-error" class="error-message"></div>
+        </div>
+        
+        <button type="submit" class="auth-btn">Registrarse</button>
+        
+        <div id="register-error" class="error-message" style="margin-top: 20px; text-align: center;"></div>
+        <div id="register-success" class="success-message" style="margin-top: 20px; text-align: center;"></div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Modal de 2FA -->
+  <div id="modal-2fa" class="modal-2fa">
+    <div class="modal-2fa-content">
+      <h2>Verificación de dos factores</h2>
+      <p>Hemos enviado un código de verificación a tu correo electrónico.</p>
+      <p>Por favor, ingresa el código para continuar:</p>
+      <input type="text" id="code-2fa" class="form-control code-input" maxlength="6" placeholder="------">
+      <button id="verify-2fa" class="auth-btn">Verificar</button>
+      <div id="2fa-error" class="error-message" style="margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Scripts para login/registro -->
+  <script>
+    // Funciones para mostrar/ocultar contraseñas
+    function toggleLoginPassword() {
+      const passwordInput = document.getElementById("login-password");
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+    
+    function toggleRegisterPassword() {
+      const passwordInput = document.getElementById("register-password");
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+    
+    function toggleConfirmPassword() {
+      const passwordInput = document.getElementById("register-confirm-password");
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+    
+    // Cambiar entre tabs de login y registro
+    document.addEventListener("DOMContentLoaded", function() {
+      const tabs = document.querySelectorAll('.auth-tab');
+      const forms = document.querySelectorAll('.auth-form');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.dataset.tab;
+          
+          // Si es la pestaña de registro, redirigir a la página de registro
+          if (tabId === 'register') {
+            window.location.href = 'registro.html';
+            return;
+          }
+          
+          // Activar tab
+          tabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Mostrar formulario correspondiente
+          forms.forEach(form => form.classList.remove('active'));
+          document.getElementById(`${tabId}-form`).classList.add('active');
+          
+          // Limpiar mensajes de error y éxito
+          document.querySelectorAll('.error-message, .success-message').forEach(msg => {
+            msg.textContent = '';
+          });
+        });
+      });
+      
+      // Manejar envío del formulario de login
+      document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Limpiar mensajes de error
+        document.querySelectorAll('#login-form .error-message').forEach(msg => {
+          msg.textContent = '';
+        });
+        
+        // Obtener valores
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        
+        // Validar campos
+        let isValid = true;
+        
+        if (!username) {
+          document.getElementById('login-username-error').textContent = 'El nombre de usuario es obligatorio';
+          isValid = false;
+        }
+        
+        if (!password) {
+          document.getElementById('login-password-error').textContent = 'La contraseña es obligatoria';
+          isValid = false;
+        }
+        
+        if (!isValid) return;
+        
+        // Mostrar estado de carga en el botón
+        const loginButton = document.getElementById('login-button');
+        const originalButtonText = loginButton.textContent;
+        loginButton.innerHTML = '<span class="spinner"></span> Iniciando sesión...';
+        loginButton.disabled = true;
+        
+        // Enviar solicitud de login
+        fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('login-error').textContent = data.error;
+            // Restaurar botón
+            loginButton.innerHTML = originalButtonText;
+            loginButton.disabled = false;
+          } else {
+            // Guardar datos del usuario
+            localStorage.setItem('usuario', JSON.stringify(data.usuario));
+            
+            // Mostrar mensaje de éxito
+            document.getElementById('login-success').textContent = 'Inicio de sesión exitoso. Enviando código de verificación...';
+            
+            // Solicitar 2FA
+            solicitarVerificacion2FA(username);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('login-error').textContent = 'Error al conectar con el servidor';
+          // Restaurar botón
+          loginButton.innerHTML = originalButtonText;
+          loginButton.disabled = false;
+        });
+      });
+      
+      // Manejar verificación 2FA
+      document.getElementById('verify-2fa').addEventListener('click', function() {
+        const codigo = document.getElementById('code-2fa').value.trim();
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        
+        if (!usuario) {
+          document.getElementById('2fa-error').textContent = 'Error: No se encontró información del usuario';
+          return;
+        }
+        
+        const username = usuario.username;
+        
+        if (!codigo || codigo.length !== 6) {
+          document.getElementById('2fa-error').textContent = 'Por favor, ingresa el código de 6 dígitos';
+          return;
+        }
+        
+        // Mostrar estado de carga
+        const verifyButton = document.getElementById('verify-2fa');
+        const originalButtonText = verifyButton.textContent;
+        verifyButton.innerHTML = '<span class="spinner"></span> Verificando...';
+        verifyButton.disabled = true;
+        
+        // Enviar solicitud de verificación
+        fetch('/verificar-2fa', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, codigo2FA: codigo })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('2fa-error').textContent = data.error;
+            // Restaurar botón
+            verifyButton.innerHTML = originalButtonText;
+            verifyButton.disabled = false;
+          } else {
+            // Cerrar modal
+            document.getElementById('modal-2fa').style.display = 'none';
+            
+            // Marcar como verificado
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            usuario.verificado = true;
+            localStorage.setItem('usuario', JSON.stringify(usuario));
+            
+            // Redirigir a la página principal
+            window.location.href = '/index.html';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('2fa-error').textContent = 'Error al conectar con el servidor';
+          // Restaurar botón
+          verifyButton.innerHTML = originalButtonText;
+          verifyButton.disabled = false;
+        });
+      });
+    });
+    
+    // Función para solicitar verificación 2FA
+    function solicitarVerificacion2FA(username) {
+      // Primero, intentamos con la ruta API
+      fetch('/api/autenticacion/solicitar-2fa', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username })
+      })
+      .then(response => {
+        if (!response.ok) {
+          // Si falla, intentamos con la ruta directa
+          return fetch('/solicitar-2fa', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username })
+          });
+        }
+        return response;
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById('login-error').textContent = data.error;
+          // Restaurar botón de login
+          const loginButton = document.getElementById('login-button');
+          loginButton.innerHTML = 'Iniciar Sesión';
+          loginButton.disabled = false;
+        } else {
+          console.log("Código 2FA enviado correctamente, redirigiendo a verificación...");
+          // Redirigir a la página de verificación 2FA
+          window.location.href = `/verificar-2fa.html?username=${encodeURIComponent(username)}`;
+        }
+      })
+      .catch(error => {
+        console.error('Error solicitando 2FA:', error);
+        document.getElementById('login-error').textContent = 'Error al conectar con el servidor';
+        // Restaurar botón de login
+        const loginButton = document.getElementById('login-button');
+        loginButton.innerHTML = 'Iniciar Sesión';
+        loginButton.disabled = false;
+      });
+    }
+    
+    // Función para validar email
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+  </script>
+
+  <!-- Service Worker PWA -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/static/sw-v2.js")
+          .then(reg => console.log("SW registrado en:", reg.scope))
+          .catch(err => console.error("Error registrando SW:", err));
+      });
+    }
+  </script>
+</body>
+</html>

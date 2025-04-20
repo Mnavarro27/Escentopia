@@ -1,0 +1,91 @@
+ /*estilos para el login*/
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Contenedor de la página */
+        .login-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: url('https://i.imgur.com/wBcAVvU.jpeg') no-repeat center top;
+            background-size: cover;
+        }
+
+        /* Contenedor del formulario */
+        .login-container {
+            background: rgba(200, 200, 200, 0.9);
+            padding: 30px;
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 250px; /* Espaciado para que quede debajo de la imagen */
+        }
+
+        /* Título */
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        /* Inputs */
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-bottom: 2px solid #000;
+            background: transparent;
+            outline: none;
+            font-size: 16px;
+        }
+
+        /* Botón */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 25px;
+            background-color: #28367b;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1d2b5f;
+        }
+
+        /* Enlace de contraseña */
+        .forgot-password {
+            margin-top: 15px;
+            font-size: 14px;
+            color: black;
+            cursor: pointer;
+        }
+
+        .register {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .register a {
+            color: #28367b;
+            text-decoration: none;
+        }
+        
+        .register a:hover {
+            text-decoration: underline;
+        }
+        

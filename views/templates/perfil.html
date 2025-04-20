@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil de Usuario</title>
+  <link rel="stylesheet" href="/static/css/stylesperfil.css">
+  <link rel="manifest" href="/manifest.json">
+
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <button class="menu-button" id="menu-button">&#9776;</button>
+    <h1 class="logo">Mi Perfil</h1>
+    <a href="index.html" class="cart-button">&#8678; Volver</a>
+  </nav>
+
+  <div class="perfil-container">
+    <form id="perfil-form">
+      <!-- Información Básica -->
+      <fieldset>
+        <legend>Información Básica</legend>
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="correo">Correo:</label>
+          <input type="email" id="correo" name="correo" required>
+        </div>
+      </fieldset>
+
+      <!-- Acceso -->
+      <fieldset>
+        <legend>Acceso</legend>
+        <div class="form-group">
+          <label for="username">Nombre de Usuario:</label>
+          <input type="text" id="username" name="username" required readonly>
+        </div>
+      </fieldset>
+
+      <!-- Botón para desplegar información adicional -->
+      <button type="button" id="verificar-btn">Verificar Perfil</button>
+
+      <!-- Sección de Información Adicional (oculta por defecto) -->
+      <div id="additional-info" style="display: none;">
+        <fieldset>
+          <legend>Información Adicional</legend>
+          <div class="form-group">
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido">
+          </div>
+          <div class="form-group">
+            <label for="tipoIdentificacion">Tipo de Identificación:</label>
+            <select id="tipoIdentificacion" name="tipoIdentificacion">
+              <option value="">Seleccione</option>
+              <option value="nacional">Nacional</option>
+              <option value="extranjero">Extranjero</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="identificacion">Número de Identificación:</label>
+            <input type="text" id="identificacion" name="identificacion">
+          </div>
+          <div class="form-group">
+            <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+          </div>
+          <div class="form-group">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" name="sexo">
+              <option value="">Seleccione</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+              <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" name="direccion">
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono">
+          </div>
+          <div class="form-group">
+            <label for="pais">País:</label>
+            <select id="pais" name="pais">
+              <option value="">Seleccione un país</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="provincia">Provincia:</label>
+            <select id="provincia" name="provincia" disabled>
+              <option value="">Seleccione una provincia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="canton">Cantón:</label>
+            <select id="canton" name="canton" disabled>
+              <option value="">Seleccione un cantón</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="distrito">Distrito:</label>
+            <select id="distrito" name="distrito" disabled>
+              <option value="">Seleccione un distrito</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Información de Tarjeta</legend>
+          <div class="form-group">
+            <label for="nombreTarjeta">Nombre del Dueño:</label>
+            <input type="text" id="nombreTarjeta" name="nombreTarjeta">
+          </div>
+          <div class="form-group">
+            <label for="numeroTarjeta">Número de Tarjeta:</label>
+            <input type="text" id="numeroTarjeta" name="numeroTarjeta">
+          </div>
+          <div class="form-group">
+            <label for="fechaVencimiento">Fecha de Vencimiento (MM/AA):</label>
+            <input type="text" id="fechaVencimiento" name="fechaVencimiento" placeholder="MM/AA" maxlength="5">
+          </div>
+          <div class="form-group">
+            <label for="codigoSeguridad">Código de Seguridad (3 dígitos):</label>
+            <input type="text" id="codigoSeguridad" name="codigoSeguridad" pattern="\d{3}" maxlength="3">
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Seguridad</legend>
+          <div class="form-group">
+            <label for="preguntaSeguridad">Pregunta de seguridad:</label>
+            <select id="preguntaSeguridad" name="preguntaSeguridad">
+              <option value="">Seleccione una pregunta</option>
+              <option value="¿Cuál es el nombre de tu primera mascota?">¿Cuál es el nombre de tu primera mascota?</option>
+              <option value="¿Cuál es tu comida favorita?">¿Cuál es tu comida favorita?</option>
+              <option value="¿Cuál es tu lugar favorito para vacacionar?">¿Cuál es tu lugar favorito para vacacionar?</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="respuestaSeguridad">Respuesta:</label>
+            <input type="text" id="respuestaSeguridad" name="respuestaSeguridad">
+          </div>
+        </fieldset>
+        
+      </div>
+
+      <button type="submit">Actualizar Perfil</button>
+    </form>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const storedUser = localStorage.getItem("usuario");
+    
+      if (!storedUser) {
+        alert("Debes iniciar sesión primero.");
+        window.location.href = "login.html";
+        return;
+      }
+    
+      const usuario = JSON.parse(storedUser);
+    
+      try {
+        const response = await fetch(`/perfil?username=${encodeURIComponent(usuario.username)}`);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!data.username) throw new Error("No se recibieron datos válidos del perfil.");
+    
+        // Rellenar Información Básica
+        document.getElementById("nombre").value = data.nombre || "";
+        document.getElementById("apellido").value = data.apellido || "";
+        document.getElementById("tipoIdentificacion").value = data.tipo_identificacion || "";
+        document.getElementById("identificacion").value = data.identificacion || "";
+        document.getElementById("correo").value = data.correo || "";
+        document.getElementById("telefono").value = data.telefono || "";
+        document.getElementById("username").value = data.username || "";
+    
+        // Rellenar Información Adicional (si existe)
+        if (data.fecha_nacimiento) {
+          // Convertir la fecha al formato YYYY-MM-DD para el input date
+          const fecha = new Date(data.fecha_nacimiento);
+          const fechaFormateada = fecha.toISOString().split('T')[0];
+          document.getElementById("fechaNacimiento").value = fechaFormateada;
+        }
+        
+        document.getElementById("sexo").value = data.sexo || "";
+        document.getElementById("direccion").value = data.direccion || "";
+        document.getElementById("nombreTarjeta").value = data.nombre_tarjeta || "";
+        document.getElementById("numeroTarjeta").value = data.numero_tarjeta || "";
+        document.getElementById("fechaVencimiento").value = data.fecha_vencimiento || "";
+        document.getElementById("codigoSeguridad").value = data.codigo_seguridad || "";
+
+        document.getElementById("preguntaSeguridad").value = data.preguntaSeguridad || "";
+        document.getElementById("respuestaSeguridad").value = ""; // por seguridad, no se muestra la respuesta anterior
+
+    
+        // Cargar selectores de ubicación
+        await cargarPaises(data.pais_id);
+        if (data.pais_id) {
+          await cargarProvincias(data.pais_id, data.provincia_id);
+          if (data.provincia_id) {
+            await cargarCantones(data.provincia_id, data.canton_id);
+            if (data.canton_id) {
+              await cargarDistritos(data.canton_id, data.distrito_id);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar el perfil:", error);
+        alert("No se pudieron cargar los datos del perfil.");
+      }
+    
+      // Evento para desplegar/ocultar la sección de información adicional
+      document.getElementById("verificar-btn").addEventListener("click", () => {
+        const additionalInfoDiv = document.getElementById("additional-info");
+    
+        if (additionalInfoDiv.style.display === "none") {
+          additionalInfoDiv.style.display = "block";
+          setTimeout(() => {
+            additionalInfoDiv.classList.add("active");
+          }, 10);
+          document.getElementById("verificar-btn").textContent = "Ocultar información adicional";
+        } else {
+          additionalInfoDiv.classList.remove("active");
+          setTimeout(() => {
+            additionalInfoDiv.style.display = "none";
+          }, 500);
+          document.getElementById("verificar-btn").textContent = "Verificar Perfil";
+        }
+      });
+      
+      // Eventos para los selectores encadenados
+      document.getElementById("pais").addEventListener("change", async function() {
+        const paisId = this.value;
+        await cargarProvincias(paisId);
+        document.getElementById("canton").innerHTML = '<option value="">Seleccione un cantón</option>';
+        document.getElementById("canton").disabled = true;
+        document.getElementById("distrito").innerHTML = '<option value="">Seleccione un distrito</option>';
+        document.getElementById("distrito").disabled = true;
+      });
+      
+      document.getElementById("provincia").addEventListener("change", async function() {
+        const provinciaId = this.value;
+        await cargarCantones(provinciaId);
+        document.getElementById("distrito").innerHTML = '<option value="">Seleccione un distrito</option>';
+        document.getElementById("distrito").disabled = true;
+      });
+      
+      document.getElementById("canton").addEventListener("change", async function() {
+        const cantonId = this.value;
+        await cargarDistritos(cantonId);
+      });
+      
+      // Evento para enviar el formulario
+      document.getElementById("perfil-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        
+        const usuario = JSON.parse(localStorage.getItem("usuario"));
+        if (!usuario) {
+          alert("Debes iniciar sesión primero.");
+          window.location.href = "login.html";
+          return;
+        }
+        
+        // Recopilar datos del formulario
+        const formData = {
+          username: usuario.username,
+          nombre: document.getElementById("nombre").value.trim(),
+          apellido: document.getElementById("apellido").value.trim(),
+          correo: document.getElementById("correo").value.trim(),
+          telefono: document.getElementById("telefono").value.trim(),
+          tipoIdentificacion: document.getElementById("tipoIdentificacion").value,
+          identificacion: document.getElementById("identificacion").value.trim(),
+          fechaNacimiento: document.getElementById("fechaNacimiento").value,
+          sexo: document.getElementById("sexo").value,
+          direccion: document.getElementById("direccion").value.trim(),
+          pais: document.getElementById("pais").value,
+          provincia: document.getElementById("provincia").value,
+          canton: document.getElementById("canton").value,
+          distrito: document.getElementById("distrito").value,
+          nombreTarjeta: document.getElementById("nombreTarjeta").value.trim(),
+          numeroTarjeta: document.getElementById("numeroTarjeta").value.trim(),
+          fechaVencimiento: document.getElementById("fechaVencimiento").value,
+          codigoSeguridad: document.getElementById("codigoSeguridad").value.trim(),
+          preguntaSeguridad: document.getElementById("preguntaSeguridad").value,
+          respuestaSeguridad: document.getElementById("respuestaSeguridad").value.trim()
+        };
+        
+        
+        try {
+          const response = await fetch("/perfil", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            alert("Perfil actualizado correctamente.");
+            // Actualizar el nombre en localStorage si cambió
+            if (formData.nombre !== usuario.nombre) {
+              usuario.nombre = formData.nombre;
+              localStorage.setItem("usuario", JSON.stringify(usuario));
+            }
+            window.location.href = "index.html";
+          } else {
+            alert("Error al actualizar el perfil: " + (data.error || "Error desconocido"));
+          }
+        } catch (error) {
+          console.error("Error al actualizar el perfil:", error);
+          alert("Error de conexión con el servidor.");
+        }
+      });
+    });
+    
+    // Funciones para cargar datos geográficos
+    async function cargarPaises(selectedPais) {
+      try {
+        const response = await fetch("/paises");
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const paises = await response.json();
+        const select = document.getElementById("pais");
+        
+        select.innerHTML = '<option value="">Seleccione un país</option>';
+        
+        paises.forEach(pais => {
+          const option = document.createElement("option");
+          option.value = pais.id;
+          option.textContent = pais.nombre;
+          if (pais.id == selectedPais) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error al cargar países:", error);
+      }
+    }
+    
+    async function cargarProvincias(paisId, selectedProvincia) {
+      if (!paisId) return;
+      
+      try {
+        const response = await fetch(`/provincias?pais=${paisId}`);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const provincias = await response.json();
+        const select = document.getElementById("provincia");
+        
+        select.innerHTML = '<option value="">Seleccione una provincia</option>';
+        select.disabled = false;
+        
+        provincias.forEach(provincia => {
+          const option = document.createElement("option");
+          option.value = provincia.id;
+          option.textContent = provincia.nombre;
+          if (provincia.id == selectedProvincia) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error al cargar provincias:", error);
+      }
+    }
+    
+    async function cargarCantones(provinciaId, selectedCanton) {
+      if (!provinciaId) return;
+      
+      try {
+        const response = await fetch(`/cantones?provincia=${provinciaId}`);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const cantones = await response.json();
+        const select = document.getElementById("canton");
+        
+        select.innerHTML = '<option value="">Seleccione un cantón</option>';
+        select.disabled = false;
+        
+        cantones.forEach(canton => {
+          const option = document.createElement("option");
+          option.value = canton.id;
+          option.textContent = canton.nombre;
+          if (canton.id == selectedCanton) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error al cargar cantones:", error);
+      }
+    }
+    
+    async function cargarDistritos(cantonId, selectedDistrito) {
+      if (!cantonId) return;
+      
+      try {
+        const response = await fetch(`/distritos?canton=${cantonId}`);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const distritos = await response.json();
+        const select = document.getElementById("distrito");
+        
+        select.innerHTML = '<option value="">Seleccione un distrito</option>';
+        select.disabled = false;
+        
+        distritos.forEach(distrito => {
+          const option = document.createElement("option");
+          option.value = distrito.id;
+          option.textContent = distrito.nombre;
+          if (distrito.id == selectedDistrito) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error al cargar distritos:", error);
+      }
+    }
+  </script>
+</body>
+</html>

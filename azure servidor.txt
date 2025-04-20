@@ -1,0 +1,20 @@
+servidor nombre : mauricio-escentopia.database.windows.net
+
+Uso de la autenticación de SQL
+
+Inicio de sesión del administrador del servidor : escentopiadmin
+password: escentopia27*
+base de datos: EscentopiaDB (mauricio-escentopia/EscentopiaDB)
+
+https://portal.azure.com/?quickstart=true#@cuc.ac.cr/resource/subscriptions/acfd5f11-c7e1-4f87-aeba-0ae1504b6cba/resourceGroups/bankapp/providers/Microsoft.Sql/servers/mauricio-escentopia/databases/EscentopiaDB/queryEditor
+
+
+GitHub
+
+usuario: Mauricio.navarro.navarro@cuc.cr
+pass: 27SmnS17*
+
+render 
+
+https://dashboard.render.com/login
+

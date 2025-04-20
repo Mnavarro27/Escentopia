@@ -1,0 +1,373 @@
+
+/* ========================================
+   Reset y Configuración Global
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+  background-attachment: fixed;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* ========================================
+   Barra de Navegación
+======================================== */
+.nav-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(90deg, #1a237e 0%, #283593 50%, #303f9f 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.menu-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.menu-button:hover {
+  transform: scale(1.1);
+}
+
+.cart-button {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cart-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   Contenedor de Perfil
+======================================== */
+.perfil-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.perfil-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.perfil-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #1a237e;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.perfil-container h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #1a237e, #5c6bc0);
+  border-radius: 3px;
+}
+
+/* ========================================
+   Formularios y Fieldsets
+======================================== */
+form fieldset {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+form fieldset:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+form fieldset legend {
+  padding: 0 15px;
+  font-weight: 600;
+  color: #1a237e;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.form-group:hover label {
+  color: #1a237e;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: "Poppins", Arial, sans-serif;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #5c6bc0;
+  box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
+  background-color: white;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: #9fa8da;
+}
+
+.form-group input[readonly] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Botones
+======================================== */
+button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  border: none;
+  border-radius: 30px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(26, 35, 126, 0.3);
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background: linear-gradient(135deg, #3949ab, #1a237e);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(26, 35, 126, 0.4);
+}
+
+button[type="submit"]:active {
+  transform: translateY(-1px);
+}
+
+/* Estilos para el botón "Verificar Perfil" */
+#verificar-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 25px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #ff8c00, #f57c00);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+  text-align: center;
+}
+
+#verificar-btn:hover {
+  background: linear-gradient(135deg, #f57c00, #ff8c00);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
+}
+
+#verificar-btn:active {
+  transform: translateY(-1px);
+}
+
+#verificar-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: skewX(-25deg);
+  transition: left 0.5s ease;
+}
+
+#verificar-btn:hover::after {
+  left: 120%;
+}
+
+/* ========================================
+   Animaciones
+======================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación para mostrar información adicional */
+#additional-info {
+  display: none;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+#additional-info.active {
+  max-height: 2000px; /* Valor alto para asegurar que todo el contenido sea visible */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================
+   Responsividad
+======================================== */
+@media (max-width: 768px) {
+  .perfil-container {
+    margin: 30px 15px;
+    padding: 20px;
+  }
+
+  form fieldset {
+    padding: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 10px;
+  }
+
+  button[type="submit"],
+  #verificar-btn {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-bar {
+    padding: 12px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .perfil-container {
+    padding: 15px;
+  }
+
+  form fieldset {
+    padding: 12px;
+  }
+
+  form fieldset legend {
+    padding: 0 10px;
+    font-size: 14px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  button[type="submit"],
+  #verificar-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+}

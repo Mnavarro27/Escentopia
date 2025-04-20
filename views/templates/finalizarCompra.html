@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar Compra - Escentopia</title>
+  
+  <!-- Estilos y manifest -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Material Icons y Google Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Nav responsivo -->
+  <script defer src="/static/js/nav.js"></script>
+
+  <!-- Estilos específicos para finalizar compra -->
+  <style>
+    .checkout-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .total-amount {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .payment-methods {
+      margin-bottom: 30px;
+    }
+    
+    .payment-method {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .payment-method:hover {
+      border-color: #4CAF50;
+    }
+    
+    .payment-method.active {
+      border-color: #4CAF50;
+      background-color: #f0f9f0;
+    }
+    
+    .payment-method-radio {
+      margin-right: 15px;
+    }
+    
+    .payment-method-icon {
+      margin-right: 15px;
+      font-size: 24px;
+      color: #666;
+    }
+    
+    .payment-method.active .payment-method-icon {
+      color: #4CAF50;
+    }
+    
+    .payment-method-details {
+      flex-grow: 1;
+    }
+    
+    .payment-method-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .payment-method-description {
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    .payment-form {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    
+    .payment-form.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    .form-control:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+    }
+    
+    .pay-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 20px;
+    }
+    
+    .pay-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .pay-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .error-message {
+      color: #ff5252;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    
+    .success-message {
+      color: #4CAF50;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    
+    .back-to-cart {
+      display: inline-block;
+      margin-top: 20px;
+      color: #2196F3;
+      text-decoration: none;
+    }
+    
+    .back-to-cart:hover {
+      text-decoration: underline;
+    }
+    
+    .back-to-cart i {
+      font-size: 18px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <nav class="nav-bar">
+    <button class="menu-button" id="menu-button">&#9776;</button>
+    <h1 class="logo">Escentopia</h1>
+    <div class="nav-buttons">
+      <a href="/perfil.html" class="icon-button"><i class="material-icons">person</i></a>
+      <a href="/carrito.html" class="icon-button"><i class="material-icons">shopping_cart</i></a>
+      <a href="/login.html" class="icon-button"><i class="material-icons">exit_to_app</i></a>
+    </div>
+  </nav>
+
+  <!-- Menú desplegable -->
+  <div class="menu-dropdown" id="menu-dropdown">
+    <ul>
+      <li><a href="/promociones.html">Ver Promociones</a></li>
+      <li><a href="/Informacion.html">Quiénes somos</a></li>
+    </ul>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    <h2 class="welcome-title">Finalizar Compra</h2>
+    
+    <div class="checkout-container">
+      <div class="total-amount">
+        Total a pagar: $<span id="totalAmount">0.00</span>
+      </div>
+      
+      <div class="payment-methods">
+        <h3>Selecciona un método de pago</h3>
+        
+        <div class="payment-method active" data-method="card">
+          <input type="radio" name="paymentMethod" value="card" checked class="payment-method-radio">
+          <i class="material-icons payment-method-icon">credit_card</i>
+          <div class="payment-method-details">
+            <div class="payment-method-title">Tarjeta de Crédito/Débito</div>
+            <div class="payment-method-description">Paga con tu tarjeta de forma segura</div>
+          </div>
+        </div>
+        
+        <div class="payment-method" data-method="paypal">
+          <input type="radio" name="paymentMethod" value="paypal" class="payment-method-radio">
+          <i class="material-icons payment-method-icon">account_balance_wallet</i>
+          <div class="payment-method-details">
+            <div class="payment-method-title">PayPal</div>
+            <div class="payment-method-description">Paga de forma rápida y segura con PayPal</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Formulario de tarjeta -->
+      <div id="cardPaymentForm" class="payment-form active">
+        <h3>Pago con Tarjeta</h3>
+        
+        <div class="form-group">
+          <label for="cardSelect">Selecciona una tarjeta</label>
+          <select id="cardSelect" class="form-control">
+            <option value="">Selecciona una tarjeta</option>
+            <!-- Se cargará dinámicamente -->
+          </select>
+          <div id="cardSelectError" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="cardHolder">Nombre en la tarjeta</label>
+          <input type="text" id="cardHolder" class="form-control" readonly>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cardNumber">Número de tarjeta</label>
+            <input type="text" id="cardNumber" class="form-control" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="cardExpiry">Fecha de vencimiento</label>
+            <input type="text" id="cardExpiry" class="form-control" readonly>
+          </div>
+        </div>
+        
+        <button id="payWithCardBtn" class="pay-btn">Pagar con Tarjeta</button>
+        <div id="cardPaymentError" class="error-message"></div>
+        <div id="cardPaymentSuccess" class="success-message"></div>
+      </div>
+      
+      <!-- Formulario de PayPal -->
+      <div id="paypalPaymentForm" class="payment-form">
+        <h3>Pago con PayPal</h3>
+        <p>Serás redirigido a PayPal para completar tu pago de forma segura.</p>
+        <button id="payWithPaypalBtn" class="pay-btn">Pagar con PayPal</button>
+        <div id="paypalPaymentError" class="error-message"></div>
+      </div>
+      
+      <a href="/carrito.html" class="back-to-cart">
+        <i class="material-icons">arrow_back</i> Volver al carrito
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <!-- Sobre nosotros -->
+      <div class="footer-section about">
+        <h3>Sobre Escentopia</h3>
+        <p>Escentopia es tu destino para encontrar las mejores fragancias y aromas para tu hogar, auto y uso personal.</p>
+        <div class="social-links">
+          <a href="#"><i class="material-icons">facebook</i></a>
+          <a href="#"><i class="material-icons">alternate_email</i></a>
+          <a href="#"><i class="material-icons">photo_camera</i></a>
+        </div>
+      </div>
+      <!-- Enlaces rápidos -->
+      <div class="footer-section links">
+        <h3>Enlaces Rápidos</h3>
+        <ul>
+          <li><a href="/index.html">Inicio</a></li>
+          <li><a href="/promociones.html">Promociones</a></li>
+          <li><a href="/Informacion.html">Quiénes Somos</a></li>
+          <li><a href="/perfil.html">Mi Perfil</a></li>
+          <li><a href="/carrito.html">Carrito</a></li>
+        </ul>
+      </div>
+      <!-- Contacto -->
+      <div class="footer-section contact">
+        <h3>Contáctanos</h3>
+        <div class="contact-item"><i class="material-icons">location_on</i> San José, Costa Rica</div>
+        <div class="contact-item"><i class="material-icons">phone</i> +506 2222-3333</div>
+        <div class="contact-item"><i class="material-icons">email</i> info@escentopia.com</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Escentopia - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- Modal de confirmación de pago -->
+  <div id="paymentConfirmationModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Pago Exitoso</h2>
+      <p>Tu pago ha sido procesado correctamente.</p>
+      <p>Número de orden: <strong id="orderNumber"></strong></p>
+      <p>Total pagado: $<strong id="paidAmount"></strong></p>
+      <p>Recibirás un correo electrónico con los detalles de tu compra.</p>
+      <button id="continueShoppingBtn" class="pay-btn">Continuar Comprando</button>
+    </div>
+  </div>
+
+  <!-- Scripts para finalizar compra -->
+  <script>
+    // Variables globales
+    let totalAmount = 0;
+    
+    // Función para obtener parámetros de la URL
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+    
+    // Función para cargar tarjetas disponibles
+    async function cargarTarjetas() {
+      try {
+        const response = await fetch('/api/simulacion/tarjetas');
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const tarjetas = await response.json();
+        const select = document.getElementById('cardSelect');
+        
+        // Limpiar opciones existentes
+        select.innerHTML = '<option value="">Selecciona una tarjeta</option>';
+        
+        // Agregar tarjetas al select
+        tarjetas.forEach(tarjeta => {
+          const option = document.createElement('option');
+          option.value = JSON.stringify({
+            numero: tarjeta.numero_tarjeta,
+            fecha: tarjeta.fecha_vencimiento,
+            propietario: tarjeta.propietario
+          });
+          option.textContent = `${tarjeta.propietario} (${tarjeta.numero_tarjeta})`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error al cargar tarjetas:', error);
+        document.getElementById('cardSelectError').textContent = 'Error al cargar tarjetas. Por favor, intenta de nuevo.';
+      }
+    }
+    
+    // Función para autocompletar datos de tarjeta
+    function autocompletarTarjeta() {
+      const select = document.getElementById('cardSelect');
+      const selectedValue = select.value;
+      
+      if (!selectedValue) {
+        // Limpiar campos si no hay selección
+        document.getElementById('cardHolder').value = '';
+        document.getElementById('cardNumber').value = '';
+        document.getElementById('cardExpiry').value = '';
+        return;
+      }
+      
+      try {
+        const tarjeta = JSON.parse(selectedValue);
+        document.getElementById('cardHolder').value = tarjeta.propietario;
+        document.getElementById('cardNumber').value = tarjeta.numero;
+        document.getElementById('cardExpiry').value = tarjeta.fecha;
+      } catch (error) {
+        console.error('Error al autocompletar tarjeta:', error);
+      }
+    }
+    
+    // Función para procesar pago con tarjeta
+    async function procesarPagoTarjeta() {
+      const select = document.getElementById('cardSelect');
+      const selectedValue = select.value;
+      
+      if (!selectedValue) {
+        document.getElementById('cardSelectError').textContent = 'Por favor, selecciona una tarjeta.';
+        return;
+      }
+      
+      try {
+        const tarjeta = JSON.parse(selectedValue);
+        
+        // Deshabilitar botón mientras se procesa
+        const payBtn = document.getElementById('payWithCardBtn');
+        payBtn.disabled = true;
+        payBtn.textContent = 'Procesando...';
+        
+        // Enviar solicitud de pago
+        const response = await fetch('/api/simulacion/validar-pago', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            numero: tarjeta.numero,
+            fecha_vencimiento: tarjeta.fecha,
+            monto: totalAmount
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Habilitar botón nuevamente
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pagar con Tarjeta';
+        
+        if (response.ok && data.validacion === 'aprobada') {
+          // Mostrar modal de confirmación
+          document.getElementById('orderNumber').textContent = Math.floor(100000 + Math.random() * 900000);
+          document.getElementById('paidAmount').textContent = totalAmount.toFixed(2);
+          document.getElementById('paymentConfirmationModal').style.display = 'block';
+          
+          // Limpiar carrito
+          localStorage.removeItem('carrito');
+        } else {
+          document.getElementById('cardPaymentError').textContent = data.motivo || 'Error al procesar el pago. Por favor, intenta con otra tarjeta.';
+        }
+      } catch (error) {
+        console.error('Error al procesar pago:', error);
+        document.getElementById('cardPaymentError').textContent = 'Error al conectar con el servidor. Por favor, intenta de nuevo.';
+        
+        // Habilitar botón nuevamente
+        document.getElementById('payWithCardBtn').disabled = false;
+        document.getElementById('payWithCardBtn').textContent = 'Pagar con Tarjeta';
+      }
+    }
+    
+    // Función para iniciar pago con PayPal
+    async function iniciarPagoPaypal() {
+      try {
+        // Deshabilitar botón mientras se procesa
+        const payBtn = document.getElementById('payWithPaypalBtn');
+        payBtn.disabled = true;
+        payBtn.textContent = 'Procesando...';
+        
+        // Enviar solicitud para crear pago en PayPal
+        const response = await fetch('/api/paypal/create-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            monto: totalAmount
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Habilitar botón nuevamente
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pagar con PayPal';
+        
+        if (response.ok && data.redirectUrl) {
+          // Redirigir a PayPal
+          window.location.href = data.redirectUrl;
+        } else {
+          document.getElementById('paypalPaymentError').textContent = data.error || 'Error al iniciar el pago con PayPal. Por favor, intenta de nuevo.';
+        }
+      } catch (error) {
+        console.error('Error al iniciar pago con PayPal:', error);
+        document.getElementById('paypalPaymentError').textContent = 'Error al conectar con el servidor. Por favor, intenta de nuevo.';
+        
+        // Habilitar botón nuevamente
+        document.getElementById('payWithPaypalBtn').disabled = false;
+        document.getElementById('payWithPaypalBtn').textContent = 'Pagar con PayPal';
+      }
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Obtener total de la URL
+      const total = getUrlParameter('total');
+      if (total) {
+        totalAmount = parseFloat(total);
+        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+      } else {
+        // Redirigir al carrito si no hay total
+        window.location.href = '/carrito.html';
+      }
+      
+      // Cargar tarjetas disponibles
+      cargarTarjetas();
+      
+      // Event listener para cambio de tarjeta
+      document.getElementById('cardSelect').addEventListener('change', autocompletarTarjeta);
+      
+      // Event listener para botón de pago con tarjeta
+      document.getElementById('payWithCardBtn').addEventListener('click', procesarPagoTarjeta);
+      
+      // Event listener para botón de pago con PayPal
+      document.getElementById('payWithPaypalBtn').addEventListener('click', iniciarPagoPaypal);
+      
+      // Event listeners para cambio de método de pago
+      document.querySelectorAll('.payment-method').forEach(method => {
+        method.addEventListener('click', function() {
+          // Actualizar radio button
+          this.querySelector('input[type="radio"]').checked = true;
+          
+          // Actualizar clases activas
+          document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Mostrar formulario correspondiente
+          const methodType = this.dataset.method;
+          document.querySelectorAll('.payment-form').forEach(form => form.classList.remove('active'));
+          document.getElementById(`${methodType}PaymentForm`).classList.add('active');
+        });
+      });
+      
+      // Event listener para cerrar modal
+      document.querySelector('#paymentConfirmationModal .close').addEventListener('click', function() {
+        document.getElementById('paymentConfirmationModal').style.display = 'none';
+      });
+      
+      // Event listener para botón de continuar comprando
+      document.getElementById('continueShoppingBtn').addEventListener('click', function() {
+        window.location.href = '/index.html';
+      });
+    });
+  </script>
+
+  <!-- Service Worker PWA -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/static/sw-v2.js")
+          .then(reg => console.log("SW registrado en:", reg.scope))
+          .catch(err => console.error("Error registrando SW:", err));
+      });
+    }
+  </script>
+</body>
+</html>

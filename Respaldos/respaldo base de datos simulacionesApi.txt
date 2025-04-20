@@ -1,0 +1,95 @@
+CREATE DATABASE simulacionesApi;
+GO
+
+USE simulacionesApi;
+GO
+
+CREATE TABLE tarjeta (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    propietario VARCHAR(100) NOT NULL,
+    numero_tarjeta VARCHAR(16) NOT NULL UNIQUE,
+    fecha_vencimiento VARCHAR(5) NOT NULL,  -- formato MM/YY
+    saldo DECIMAL(10,2) NOT NULL,
+    estado VARCHAR(20) NOT NULL CHECK (estado IN ('activa', 'inactiva'))
+);
+
+INSERT INTO tarjeta (propietario, numero_tarjeta, fecha_vencimiento, saldo, estado)
+VALUES 
+('Mauricio Navarro', '1234567812345678', '12/26', 1500.00, 'activa'),
+('Juan Pérez', '2234567812345678', '12/28', 100.00, 'inactiva'),
+('Ana López', '8765432187654321', '11/27', 50.00, 'activa'),
+('Tarjeta Inactiva', '4444555566667777', '12/25', 200.00, 'inactiva');
+
+
+
+USE simulacionesApi;
+GO
+
+CREATE TABLE usuarios (
+    cedula VARCHAR(20) PRIMARY KEY,
+    nombre_completo VARCHAR(150) NOT NULL,
+    nombre_padre VARCHAR(100),
+    id_padre VARCHAR(20),
+    nombre_madre VARCHAR(100),
+    id_madre VARCHAR(20),
+    fecha_nacimiento DATE,
+    nacionalidad VARCHAR(50),
+    edad INT,
+    hijos_registrados INT,
+    matrimonios_registrados INT
+);
+
+INSERT INTO usuarios (cedula, nombre_completo, nombre_padre, id_padre, nombre_madre, id_madre, fecha_nacimiento, nacionalidad, edad, hijos_registrados, matrimonios_registrados)
+VALUES 
+( '101010101', 'Carlos Rivera López', 'Juan Rivera', '101110100', 'María López', '101010099', '1990-05-12', 'Costarricense', 34, 2, 1),
+( '301110201', 'Pedro Navarro López', 'Sebastian Rivera', '102010100', 'Jennifer López', '102010099', '1996-05-12', 'Costarricense', 28, 0, 1),
+( '101410851', 'Juan López Rojas', 'Oscar Rivera', '103010100', 'Veronica López', '103010099', '1995-05-12', 'Costarricense', 29, 1, 0);
+
+
+CREATE TABLE componentes_salud (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    nombre NVARCHAR(100) NOT NULL,
+    permitido BIT NOT NULL  -- 1 = permitido, 0 = prohibido
+);
+
+INSERT INTO componentes_salud (nombre, permitido) VALUES 
+('alcohol', 1),
+('amoníaco', 0),
+('lavanda', 1),
+('metanol', 0),
+('vainilla', 1);
+
+
+CREATE TABLE transporte_envios (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    provincia NVARCHAR(50),
+    canton NVARCHAR(50),
+    distrito NVARCHAR(50),
+    disponible BIT NOT NULL  -- 1 = sí se puede enviar, 0 = no
+);
+
+INSERT INTO transporte_envios (provincia, canton, distrito, disponible) VALUES 
+('San José', 'Escazú', 'San Rafael', 1),
+('Alajuela', 'Grecia', 'Tacares', 1),
+('Cartago', 'Oreamuno', 'San Rafael', 0),
+('Heredia', 'San Pablo', 'San Pablo', 1),
+('Puntarenas', 'Garabito', 'Jacó', 0);
+
+
+CREATE TABLE recipientes (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    tipo NVARCHAR(50), -- vidrio, plástico, ecológico
+    cantidad INT NOT NULL
+);
+
+INSERT INTO recipientes (tipo, cantidad) VALUES 
+('vidrio', 50),
+('plástico', 100),
+('ecológico', 30);
+
+
+
+  USE EscentopiaDB;
+ALTER TABLE dbo.Usuarios
+ALTER COLUMN fecha_nacimiento DATE NULL;
+

@@ -1,0 +1,5 @@
+https://developer.paypal.com/dashboard/accounts
+
+correo: sb-nxzvw38396572@personal.example.com
+
+contraseña: LW-lt-O5

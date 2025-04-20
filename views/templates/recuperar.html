@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recuperar Contraseña - Escentopia</title>
+<link rel="stylesheet" href="/static/css/styleslogin.css" />
+<link rel="manifest" href="/manifest.json" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<div class="login-page">
+  <div class="login-container">
+    <h2>Recuperar Contraseña</h2>
+
+    <p>Elige un método de recuperación:</p>
+    <select id="metodoRecuperacion">
+      <option value="">Seleccione una opción</option>
+      <option value="email">Recuperar con Token (Correo)</option>
+      <option value="preguntas">Recuperar con Preguntas de Seguridad</option>
+    </select>
+
+    <!-- Recuperar por correo -->
+    <div id="recuperarPorCorreo" class="method-container" style="display: none;">
+      <div class="method-title">Recuperación por Correo Electrónico</div>
+      <p>Ingresa tu nombre de usuario y correo electrónico para recibir un código de verificación.</p>
+      
+      <input type="text" id="username-email" placeholder="Nombre de usuario" />
+      <input type="email" id="email" placeholder="Correo electrónico" />
+      <button id="enviar-codigo">Enviar Código</button>
+      
+      <div id="codigoDiv" style="display: none;">
+        <div class="method-title">Verificación de Código</div>
+        <p>Ingresa el código de 6 dígitos que enviamos a tu correo electrónico.</p>
+        <input type="text" id="codigo" placeholder="Ingresa el código recibido" maxlength="6" />
+        <button id="verificar-codigo">Verificar Código</button>
+      </div>
+      
+      <div id="success-email" class="success-message"></div>
+    </div>
+
+    <!-- Recuperar por preguntas -->
+    <div id="recuperarPorPreguntas" class="method-container" style="display: none;">
+      <div class="method-title">Recuperación por Preguntas de Seguridad</div>
+      <p>Ingresa tu nombre de usuario y responde tu pregunta de seguridad para recuperar tu contraseña.</p>
+      
+      <input type="text" id="username" placeholder="Ingresa tu usuario" />
+      <select id="preguntaSeguridad">
+        <option value="">Seleccione una pregunta</option>
+        <option value="¿Cuál es el nombre de tu primera mascota?">¿Cuál es el nombre de tu primera mascota?</option>
+        <option value="¿Cuál es tu comida favorita?">¿Cuál es tu comida favorita?</option>
+        <option value="¿Cuál es tu lugar favorito para vacacionar?">¿Cuál es tu lugar favorito para vacacionar?</option>
+      </select>
+      <input type="text" id="respuestaSeguridad" placeholder="Ingresa tu respuesta" />
+      <button id="verificar-pregunta">Verificar</button>
+      
+      <div id="success-pregunta" class="success-message"></div>
+    </div>
+
+    <p id="mensaje" style="display: none;"></p>
+    <p class="volver"><a href="login.html">Volver al Login</a></p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const metodoSelect = document.getElementById("metodoRecuperacion");
+    const recuperarPorCorreoDiv = document.getElementById("recuperarPorCorreo");
+    const recuperarPorPreguntasDiv = document.getElementById("recuperarPorPreguntas");
+    const mensajeEl = document.getElementById("mensaje");
+    const codigoDiv = document.getElementById("codigoDiv");
+    const enviarBtn = document.getElementById("enviar-codigo");
+    const verificarCodigoBtn = document.getElementById("verificar-codigo");
+    const verificarPreguntaBtn = document.getElementById("verificar-pregunta");
+    const successEmailEl = document.getElementById("success-email");
+    const successPreguntaEl = document.getElementById("success-pregunta");
+    const usernameInput = document.getElementById("username");
+    const preguntaSeguridadSelect = document.getElementById("preguntaSeguridad");
+
+    // Animaciones para los botones
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach((button) => {
+      button.addEventListener("mousedown", function () {
+        this.style.transform = "scale(0.98)";
+      });
+
+      button.addEventListener("mouseup", function () {
+        this.style.transform = "scale(1)";
+      });
+    });
+
+    // Cambiar la visibilidad de los métodos de recuperación
+    metodoSelect.addEventListener("change", () => {
+      const opcion = metodoSelect.value;
+      recuperarPorCorreoDiv.style.display = opcion === "email" ? "block" : "none";
+      recuperarPorPreguntasDiv.style.display = opcion === "preguntas" ? "block" : "none";
+      mensajeEl.style.display = "none"; // Limpiar mensajes previos
+
+      // Resetear los formularios
+      if (opcion === "email") {
+        document.getElementById("username-email").focus();
+      } else if (opcion === "preguntas") {
+        document.getElementById("username").focus();
+      }
+    });
+
+    // Validación de entrada para el código (solo números)
+    const codigoInput = document.getElementById("codigo");
+    if (codigoInput) {
+      codigoInput.addEventListener("input", function (e) {
+        this.value = this.value.replace(/[^0-9]/g, "");
+      });
+    }
+
+    // Cargar la pregunta de seguridad cuando se ingresa el username
+    usernameInput.addEventListener("blur", async () => {
+      const username = usernameInput.value.trim();
+      if (!username) return;
+
+      try {
+        const response = await fetch(`/perfil?username=${encodeURIComponent(username)}`);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.preguntaSeguridad) {
+          // Seleccionar la pregunta de seguridad del usuario
+          const options = preguntaSeguridadSelect.options;
+          for (let i = 0; i < options.length; i++) {
+            if (options[i].value === data.preguntaSeguridad) {
+              options[i].selected = true;
+              break;
+            }
+          }
+          
+          // Deshabilitar el select para que no se pueda cambiar
+          preguntaSeguridadSelect.disabled = true;
+        } else {
+          // Si no tiene pregunta de seguridad, mostrar mensaje
+          mostrarMensaje("Este usuario no tiene configurada una pregunta de seguridad. Por favor, utiliza otro método de recuperación.");
+          preguntaSeguridadSelect.disabled = false;
+        }
+      } catch (error) {
+        console.error("Error al cargar la pregunta de seguridad:", error);
+      }
+    });
+
+    // 📌 1️⃣ Enviar código al correo
+    if (enviarBtn) {
+      enviarBtn.addEventListener("click", async () => {
+        const username = document.getElementById("username-email").value.trim();
+        const email = document.getElementById("email").value.trim();
+
+        if (!username || !email) {
+          mostrarMensaje("Por favor, completa todos los campos.");
+          return;
+        }
+
+        // Validar formato de correo electrónico
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          mostrarMensaje("Por favor, ingresa un correo electrónico válido.");
+          return;
+        }
+
+        // Mostrar estado de carga
+        enviarBtn.disabled = true;
+        enviarBtn.textContent = "Enviando...";
+        enviarBtn.style.backgroundColor = "#999";
+
+        try {
+          const response = await fetch("/api/recuperacion/enviar-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Mostrar mensaje de éxito
+            successEmailEl.textContent = "Se ha enviado un código a tu correo. Ingrésalo para continuar.";
+            successEmailEl.style.display = "block";
+
+            // Guardar el username para la verificación
+            localStorage.setItem("recovery_username", username);
+
+            // Mostrar el div del código
+            codigoDiv.style.display = "block";
+
+            // Enfocar el campo de código
+            document.getElementById("codigo").focus();
+          } else {
+            mostrarMensaje(data.error || "Error al enviar el código.");
+          }
+        } catch (error) {
+          console.error("Error en el envío de código:", error);
+          mostrarMensaje("Error de conexión con el servidor.");
+        } finally {
+          // Restaurar el botón
+          enviarBtn.disabled = false;
+          enviarBtn.textContent = "Enviar Código";
+          enviarBtn.style.backgroundColor = "";
+        }
+      });
+    }
+
+    // 📌 2️⃣ Verificar el código antes de cambiar la contraseña
+    if (verificarCodigoBtn) {
+      verificarCodigoBtn.addEventListener("click", async () => {
+        const username = localStorage.getItem("recovery_username");
+        const codigo = document.getElementById("codigo").value.trim();
+
+        if (!username) {
+          mostrarMensaje("Error: No se encontró el nombre de usuario. Intenta nuevamente.");
+          return;
+        }
+
+        if (!codigo) {
+          mostrarMensaje("Por favor, ingresa el código recibido.");
+          return;
+        }
+
+        if (codigo.length !== 6) {
+          mostrarMensaje("El código debe tener 6 dígitos.");
+          return;
+        }
+
+        // Mostrar estado de carga
+        verificarCodigoBtn.disabled = true;
+        verificarCodigoBtn.textContent = "Verificando...";
+        verificarCodigoBtn.style.backgroundColor = "#999";
+
+        try {
+          const response = await fetch("/api/recuperacion/verificar-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, codigo }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Mostrar mensaje de éxito
+            successEmailEl.textContent = "Código verificado correctamente. Redirigiendo...";
+            successEmailEl.style.display = "block";
+
+            // Esperar un momento para mostrar el mensaje
+            setTimeout(() => {
+              window.location.href = `cambiar-contrasena.html?username=${encodeURIComponent(username)}`;
+            }, 1500);
+          } else {
+            mostrarMensaje(data.error || "Código incorrecto.");
+
+            // Restaurar el botón
+            verificarCodigoBtn.disabled = false;
+            verificarCodigoBtn.textContent = "Verificar Código";
+            verificarCodigoBtn.style.backgroundColor = "";
+          }
+        } catch (error) {
+          console.error("Error al verificar código:", error);
+          mostrarMensaje("Error de conexión con el servidor.");
+
+          // Restaurar el botón
+          verificarCodigoBtn.disabled = false;
+          verificarCodigoBtn.textContent = "Verificar Código";
+          verificarCodigoBtn.style.backgroundColor = "";
+        }
+      });
+    }
+
+    // 📌 3️⃣ Verificar pregunta de seguridad
+    if (verificarPreguntaBtn) {
+      verificarPreguntaBtn.addEventListener("click", async () => {
+        const username = document.getElementById("username").value.trim();
+        const pregunta = document.getElementById("preguntaSeguridad").value;
+        const respuesta = document.getElementById("respuestaSeguridad").value.trim();
+
+        if (!username || !pregunta || !respuesta) {
+          mostrarMensaje("Por favor, completa todos los campos.");
+          return;
+        }
+
+        // Mostrar estado de carga
+        verificarPreguntaBtn.disabled = true;
+        verificarPreguntaBtn.textContent = "Verificando...";
+        verificarPreguntaBtn.style.backgroundColor = "#999";
+
+        try {
+          const response = await fetch("/api/recuperacion/verificar-pregunta", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, pregunta, respuesta }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Mostrar mensaje de éxito
+            successPreguntaEl.textContent = "Verificación exitosa. Redirigiendo...";
+            successPreguntaEl.style.display = "block";
+
+            // Esperar un momento para mostrar el mensaje
+            setTimeout(() => {
+              window.location.href = `cambiar-contrasena.html?username=${encodeURIComponent(username)}`;
+            }, 1500);
+          } else {
+            mostrarMensaje(data.error || "Respuesta incorrecta.");
+
+            // Restaurar el botón
+            verificarPreguntaBtn.disabled = false;
+            verificarPreguntaBtn.textContent = "Verificar";
+            verificarPreguntaBtn.style.backgroundColor = "";
+          }
+        } catch (error) {
+          console.error("Error en la validación:", error);
+          mostrarMensaje("Error de conexión con el servidor.");
+
+          // Restaurar el botón
+          verificarPreguntaBtn.disabled = false;
+          verificarPreguntaBtn.textContent = "Verificar";
+          verificarPreguntaBtn.style.backgroundColor = "";
+        }
+      });
+    }
+
+    // Función para mostrar mensajes de error con animación
+    function mostrarMensaje(msg) {
+      mensajeEl.textContent = msg;
+      mensajeEl.style.display = "block";
+
+      // Aplicar animación de shake
+      mensajeEl.style.animation = "none";
+      setTimeout(() => {
+        mensajeEl.style.animation = "shake 0.5s ease-in-out";
+      }, 10);
+    }
+  });
+</script>
+</body>
+</html>

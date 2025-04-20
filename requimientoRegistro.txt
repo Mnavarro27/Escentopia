@@ -1,0 +1,674 @@
+1. Mucha información en el registro de un nuevo usuario 
+
+registro.html 
+
+en la página de usuario se solicita muchos datos para poder registrarse se requiere cambiar para que el usuario pueda registrarse solo anotando el nombre, apellido, Tipo de Identificación, cédula, nombre de usuario, contraseña, correo y teléfono 
+
+perfil.html
+
+en perfil se debe de trabajr de la misma forma que esta funcionando cargardo desde la base de datos la informacion del usuario, pero hay que agregar un boton que dicha verificar perfil y ahi se debe de poder guardar el resto de la informacion del usuario como sexo, Fecha de Nacimiento, paies, la tarjeta y demas datos los cuales se tomaman antes desde registro.html 
+
+te voy a pasar los 2 cogidos relacionados 
+
+
+registro.html 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="../static/css/stylesuser.css">
+</head>
+<body>
+  <div class="registro-container">
+    <h2>Registro de Usuario</h2>
+    <form action="/registro" method="POST" id="registro-form">
+      <!-- Información Personal -->
+      <fieldset>
+        <legend>Información Personal</legend>
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="apellido">Apellido:</label>
+          <input type="text" id="apellido" name="apellido" required>
+        </div>
+        <div class="form-group">
+          <label for="tipoIdentificacion">Tipo de Identificación:</label>
+          <select id="tipoIdentificacion" name="tipoIdentificacion" required>
+            <option value="">Seleccione</option>
+            <option value="nacional">Nacional</option>
+            <option value="extranjero">Extranjero</option>
+        </select>
+        </div>
+        <div class="form-group">
+          <label for="identificacion">Número de Identificación:</label>
+          <input type="text" id="identificacion" name="identificacion" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+          <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+        </div>
+        <div class="form-group">
+          <label for="sexo">Sexo:</label>
+          <select id="sexo" name="sexo" required>
+            <option value="">Seleccione</option>
+            <option value="hombre">Hombre</option>
+            <option value="mujer">Mujer</option>
+            <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="pais">País:</label>
+          <select id="pais" name="pais" required>
+            <option value="">Seleccione un país</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="provincia">Provincia:</label>
+          <select id="provincia" name="provincia" required>
+            <option value="">Seleccione una provincia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="canton">Cantón:</label>
+          <select id="canton" name="canton" required>
+            <option value="">Seleccione un cantón</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="distrito">Distrito:</label>
+          <select id="distrito" name="distrito" required>
+            <option value="">Seleccione un distrito</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="direccion">Dirección Exacta:</label>
+          <input type="text" id="direccion" name="direccion" required>
+        </div>
+        <div class="form-group">
+          <label for="telefono">Número de Teléfono:</label>
+          <input type="tel" id="telefono" name="telefono" required>
+        </div>
+        <div class="form-group">
+          <label for="correo">Correo Electrónico:</label>
+          <input type="email" id="correo" name="correo" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Nombre de Usuario:</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña:</label>
+          <input type="password" id="password" name="password" required>
+          <button type="button" onclick="togglePassword()">👁️</button>
+          
+          <div id="passwordRequirements">
+            <p id="length" class="invalid">❌ Mínimo 8 caracteres</p>
+            <p id="uppercase" class="invalid">❌ Al menos una letra mayúscula</p>
+            <p id="lowercase" class="invalid">❌ Al menos una letra minúscula</p>
+            <p id="number" class="invalid">❌ Al menos un número</p>
+            <p id="special" class="invalid">❌ Al menos un carácter especial (!@#$%^&*)</p>
+          </div>
+        
+          <p id="passwordError" class="error-message" style="display: none; color: red;">
+            La contraseña no cumple con los requisitos.
+          </p>
+        </div>
+      </fieldset>
+
+      <!-- Seguridad (Pregunta y Respuesta) -->
+      <fieldset>
+        <legend>Seguridad</legend>
+        <div class="form-group">
+          <label for="preguntaSeguridad">Pregunta de Seguridad:</label>
+          <select id="preguntaSeguridad" name="preguntaSeguridad" required>
+            <option value="">Seleccione una opción</option>
+            <option value="mascota">¿Cuál es el nombre de tu primera mascota?</option>
+            <option value="escuela">¿Cuál fue el nombre de tu escuela primaria?</option>
+            <option value="madre">¿Cuál es el segundo nombre de tu madre?</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="respuestaSeguridad">Respuesta de Seguridad:</label>
+          <input type="text" id="respuestaSeguridad" name="respuestaSeguridad" required>
+        </div>
+      </fieldset>
+
+      <!-- Información de Tarjeta -->
+      <fieldset>
+        <legend>Información de Tarjeta</legend>
+        <div class="form-group">
+          <label for="nombreTarjeta">Nombre del Dueño:</label>
+          <input type="text" id="nombreTarjeta" name="nombreTarjeta" required>
+        </div>
+        <div class="form-group">
+          <label for="numeroTarjeta">Número de Tarjeta:</label>
+          <input type="text" id="numeroTarjeta" name="numeroTarjeta" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+          <input type="month" id="fechaVencimiento" name="fechaVencimiento" required>
+        </div>
+        <div class="form-group">
+          <label for="codigoSeguridad">Código de Seguridad (3 dígitos):</label>
+          <input type="text" id="codigoSeguridad" name="codigoSeguridad"
+                 pattern="\d{3}" title="Debe ser un código de 3 dígitos" required>
+        </div>
+      </fieldset>
+
+      <button type="submit">Registrar</button>
+    </form>
+  </div>
+
+  <script src="../static/js/registro.js"></script>
+</body>
+</html>
+
+registro.js
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("registro-form");
+    const passwordInput = document.getElementById("password");
+    const passwordError = document.getElementById("passwordError");
+
+    const paisSelect = document.getElementById("pais");
+    const provinciaSelect = document.getElementById("provincia");
+    const cantonSelect = document.getElementById("canton");
+    const distritoSelect = document.getElementById("distrito");
+
+    // 📌 Deshabilitar selectores inicialmente
+    provinciaSelect.disabled = true;
+    cantonSelect.disabled = true;
+    distritoSelect.disabled = true;
+
+    // 📌 Función para limpiar y deshabilitar selects
+    function limpiarSelect(selectElement, mensajeDefault) {
+        selectElement.innerHTML = `<option value="">${mensajeDefault}</option>`;
+        selectElement.disabled = true;
+    }
+
+    // 📌 Cargar lista de países al iniciar la página
+    fetch("http://localhost:5000/paises")
+        .then(response => response.json())
+        .then(data => {
+            paisSelect.innerHTML = '<option value="">Seleccione un país</option>';
+            data.forEach(pais => {
+                const option = document.createElement("option");
+                option.value = pais.id;
+                option.textContent = pais.nombre;
+                paisSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Error al cargar países:", error));
+
+    // 📌 Evento al seleccionar un país
+    paisSelect.addEventListener("change", (event) => {
+        const paisId = event.target.value;
+        provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+        provinciaSelect.disabled = true;
+        cantonSelect.innerHTML = '<option value="">Seleccione un cantón</option>';
+        cantonSelect.disabled = true;
+        distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
+        distritoSelect.disabled = true;
+
+        if (paisId) {
+            fetch(`http://localhost:5000/provincias?pais=${paisId}`)
+                .then(response => response.json())
+                .then(data => {
+                    provinciaSelect.disabled = false;
+                    data.forEach(provincia => {
+                        const option = document.createElement("option");
+                        option.value = provincia.id;
+                        option.textContent = provincia.nombre;
+                        provinciaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error al cargar provincias:", error));
+        }
+    });
+
+    // 📌 Evento al seleccionar una provincia
+    provinciaSelect.addEventListener("change", (event) => {
+        const provinciaId = event.target.value;
+        cantonSelect.innerHTML = '<option value="">Seleccione un cantón</option>';
+        cantonSelect.disabled = true;
+        distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
+        distritoSelect.disabled = true;
+
+        if (provinciaId) {
+            fetch(`http://localhost:5000/cantones?provincia=${provinciaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    cantonSelect.disabled = false;
+                    data.forEach(canton => {
+                        const option = document.createElement("option");
+                        option.value = canton.id;
+                        option.textContent = canton.nombre;
+                        cantonSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error al cargar cantones:", error));
+        }
+    });
+
+    // 📌 Evento al seleccionar un cantón
+    cantonSelect.addEventListener("change", (event) => {
+        const cantonId = event.target.value;
+        distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
+        distritoSelect.disabled = true;
+
+        if (cantonId) {
+            fetch(`http://localhost:5000/distritos?canton=${cantonId}`)
+                .then(response => response.json())
+                .then(data => {
+                    distritoSelect.disabled = false;
+                    data.forEach(distrito => {
+                        const option = document.createElement("option");
+                        option.value = distrito.id;
+                        option.textContent = distrito.nombre;
+                        distritoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error al cargar distritos:", error));
+        }
+    });
+
+    // 📌 Evento al enviar el formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Prevenir el envío por defecto
+
+        const formData = {
+            nombre: document.getElementById("nombre").value.trim(),
+            apellido: document.getElementById("apellido").value.trim(),
+            tipoIdentificacion: document.getElementById("tipoIdentificacion").value,
+            identificacion: document.getElementById("identificacion").value.trim(),
+            fechaNacimiento: document.getElementById("fechaNacimiento").value,
+            sexo: document.getElementById("sexo").value,
+            direccion: document.getElementById("direccion").value.trim(),
+            telefono: document.getElementById("telefono").value.trim(),
+            correo: document.getElementById("correo").value.trim(),
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value.trim(),
+            preguntaSeguridad: document.getElementById("preguntaSeguridad").value,
+            respuestaSeguridad: document.getElementById("respuestaSeguridad").value.trim(),
+            nombreTarjeta: document.getElementById("nombreTarjeta").value.trim(),
+            numeroTarjeta: document.getElementById("numeroTarjeta").value.trim(),
+            fechaVencimiento: document.getElementById("fechaVencimiento").value,
+            codigoSeguridad: document.getElementById("codigoSeguridad").value.trim(),
+            pais: paisSelect.value, 
+            provincia: provinciaSelect.value,
+            canton: cantonSelect.value,
+            distrito: distritoSelect.value
+        };
+
+        console.log("📌 Datos enviados al servidor:", formData); // 🔍 Verifica si los valores llegan correctamente
+
+        try {
+            const response = await fetch("http://localhost:5000/registro", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Usuario registrado correctamente.");
+                window.location.href = "login.html";
+            } else {
+                alert("Error en el registro: " + (data.error || "Datos incorrectos."));
+            }
+        } catch (error) {
+            console.error("Error de conexión con el servidor:", error);
+            alert("Error de conexión con el servidor.");
+        }
+    });
+
+    // 📌 Validación de contraseña en tiempo real
+    passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+        const lengthValid = password.length >= 8;
+        const uppercaseValid = /[A-Z]/.test(password);
+        const lowercaseValid = /[a-z]/.test(password);
+        const numberValid = /\d/.test(password);
+        const specialValid = /[@$!%*?&]/.test(password);
+
+        updateValidationStatus(document.getElementById("length"), lengthValid);
+        updateValidationStatus(document.getElementById("uppercase"), uppercaseValid);
+        updateValidationStatus(document.getElementById("lowercase"), lowercaseValid);
+        updateValidationStatus(document.getElementById("number"), numberValid);
+        updateValidationStatus(document.getElementById("special"), specialValid);
+    });
+
+    // 📌 Función para actualizar el estado de la validación
+    function updateValidationStatus(element, isValid) {
+        element.classList.toggle("valid", isValid);
+        element.classList.toggle("invalid", !isValid);
+        element.innerHTML = isValid ? element.innerHTML.replace("❌", "✅") : element.innerHTML.replace("✅", "❌");
+    }
+
+});
+
+// 📌 Mostrar/ocultar contraseña
+function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+}
+
+perfil.html
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil de Usuario</title>
+  <link rel="stylesheet" href="../static/css/stylesperfil.css">
+</head>
+<body>
+  <div class="perfil-container">
+    <h2>Mi Perfil</h2>
+    <form id="perfil-form">
+      <!-- Información Personal -->
+      <fieldset>
+        <legend>Información Personal</legend>
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="apellido">Apellido:</label>
+          <input type="text" id="apellido" name="apellido" required>
+        </div>
+        <div class="form-group">
+          <label for="tipoIdentificacion">Tipo de Identificación:</label>
+          <select id="tipoIdentificacion" name="tipoIdentificacion" required>
+            <option value="nacional">Nacional</option>
+            <option value="extranjero">Extranjero</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="identificacion">Número de Identificación:</label>
+          <input type="text" id="identificacion" name="identificacion" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+          <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+        </div>
+        <div class="form-group">
+          <label for="sexo">Sexo:</label>
+          <select id="sexo" name="sexo" required>
+            <option value="hombre">Hombre</option>
+            <option value="mujer">Mujer</option>
+            <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+          </select>
+        </div>
+          <div class="form-group">
+            <label for="pais">País:</label>
+            <select id="pais" name="pais" required>
+                <option value="">Seleccione un país</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="provincia">Provincia:</label>
+            <select id="provincia" name="provincia" required>
+                <option value="">Seleccione una provincia</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="canton">Cantón:</label>
+            <select id="canton" name="canton" required>
+                <option value="">Seleccione un cantón</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="distrito">Distrito:</label>
+            <select id="distrito" name="distrito" required>
+                <option value="">Seleccione un distrito</option>
+            </select>
+        </div>
+      
+        <div class="form-group">
+          <label for="direccion">Dirección:</label>
+          <input type="text" id="direccion" name="direccion" required>
+        </div>
+        <div class="form-group">
+          <label for="telefono">Teléfono:</label>
+          <input type="tel" id="telefono" name="telefono" required>
+        </div>
+        <div class="form-group">
+          <label for="correo">Correo:</label>
+          <input type="email" id="correo" name="correo" required>
+        </div>
+      </fieldset>
+      
+      <!-- Datos de Acceso -->
+      <fieldset>
+        <legend>Acceso</legend>
+        <div class="form-group">
+          <label for="username">Nombre de Usuario:</label>
+          <input type="text" id="username" name="username" required readonly>
+        </div>
+      </fieldset>
+      
+      <!-- Información de Tarjeta -->
+      <fieldset>
+        <legend>Información de Tarjeta</legend>
+        <div class="form-group">
+          <label for="nombreTarjeta">Nombre del Dueño:</label>
+          <input type="text" id="nombreTarjeta" name="nombreTarjeta" required>
+        </div>
+        <div class="form-group">
+          <label for="numeroTarjeta">Número de Tarjeta:</label>
+          <input type="text" id="numeroTarjeta" name="numeroTarjeta" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+          <input type="month" id="fechaVencimiento" name="fechaVencimiento" required>
+        </div>
+        <div class="form-group">
+          <label for="codigoSeguridad">Código de Seguridad (3 dígitos):</label>
+          <input type="text" id="codigoSeguridad" name="codigoSeguridad" pattern="\d{3}" required>
+        </div>
+      </fieldset>
+      
+      <button type="submit">Actualizar Perfil</button>
+    </form>
+  </div>
+  <script src="../static/js/perfil.js"></script>
+</body>
+</html>
+
+perfil.js
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const storedUser = localStorage.getItem("usuario");
+
+    if (!storedUser) {
+        alert("Debes iniciar sesión primero.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const usuario = JSON.parse(storedUser);
+
+    // 📌 Obtener el perfil del usuario
+    try {
+        const response = await fetch(`http://localhost:5000/perfil?username=${encodeURIComponent(usuario.username)}`);
+        const data = await response.json();
+
+        if (!data.username) throw new Error("No se recibieron datos válidos del perfil.");
+
+        // Cargar los datos del usuario en los campos
+        document.getElementById("nombre").value = data.nombre || "";
+        document.getElementById("apellido").value = data.apellido || "";
+        document.getElementById("tipoIdentificacion").value = data.tipo_identificacion || "";
+        document.getElementById("identificacion").value = data.identificacion || "";
+        document.getElementById("fechaNacimiento").value = data.fecha_nacimiento?.split("T")[0] || "";
+        document.getElementById("sexo").value = data.sexo || "";
+        document.getElementById("direccion").value = data.direccion || "";
+        document.getElementById("telefono").value = data.telefono || "";
+        document.getElementById("correo").value = data.correo || "";
+        document.getElementById("username").value = data.username || "";
+        document.getElementById("nombreTarjeta").value = data.nombre_tarjeta || "";
+        document.getElementById("numeroTarjeta").value = data.numero_tarjeta || "";
+        document.getElementById("fechaVencimiento").value = data.fecha_vencimiento || "";
+        document.getElementById("codigoSeguridad").value = data.codigo_seguridad || "";
+
+        // 📌 Cargar los selectores de ubicación
+        await cargarPaises(data.pais_id);
+        await cargarProvincias(data.pais_id, data.provincia_id);
+        await cargarCantones(data.provincia_id, data.canton_id);
+        await cargarDistritos(data.canton_id, data.distrito_id);
+
+    } catch (error) {
+        console.error("Error al cargar el perfil:", error);
+        alert("No se pudieron cargar los datos del perfil.");
+    }
+});
+
+// 📌 Cargar Paises
+async function cargarPaises(selectedPais) {
+    const response = await fetch("http://localhost:5000/paises");
+    const data = await response.json();
+    const paisSelect = document.getElementById("pais");
+
+    paisSelect.innerHTML = '<option value="">Seleccione un país</option>';
+    data.forEach(pais => {
+        const option = document.createElement("option");
+        option.value = pais.id;
+        option.textContent = pais.nombre;
+        if (pais.id === selectedPais) option.selected = true;
+        paisSelect.appendChild(option);
+    });
+}
+
+// 📌 Cargar Provincias cuando se seleccione un país
+document.getElementById("pais").addEventListener("change", async (event) => {
+    const paisId = event.target.value;
+    await cargarProvincias(paisId);
+});
+
+// 📌 Cargar provincias
+async function cargarProvincias(paisId, selectedProvincia) {
+    if (!paisId) return;
+    const response = await fetch(`http://localhost:5000/provincias?pais=${paisId}`);
+    const data = await response.json();
+    const provinciaSelect = document.getElementById("provincia");
+
+    provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+    data.forEach(provincia => {
+        const option = document.createElement("option");
+        option.value = provincia.id;
+        option.textContent = provincia.nombre;
+        if (provincia.id === selectedProvincia) option.selected = true;
+        provinciaSelect.appendChild(option);
+    });
+}
+
+// 📌 Cargar Cantones cuando se seleccione una provincia
+document.getElementById("provincia").addEventListener("change", async (event) => {
+    const provinciaId = event.target.value;
+    await cargarCantones(provinciaId);
+});
+
+// 📌 Cargar cantones
+async function cargarCantones(provinciaId, selectedCanton) {
+    if (!provinciaId) return;
+    const response = await fetch(`http://localhost:5000/cantones?provincia=${provinciaId}`);
+    const data = await response.json();
+    const cantonSelect = document.getElementById("canton");
+
+    cantonSelect.innerHTML = '<option value="">Seleccione un cantón</option>';
+    data.forEach(canton => {
+        const option = document.createElement("option");
+        option.value = canton.id;
+        option.textContent = canton.nombre;
+        if (canton.id === selectedCanton) option.selected = true;
+        cantonSelect.appendChild(option);
+    });
+}
+
+// 📌 Cargar Distritos cuando se seleccione un cantón
+document.getElementById("canton").addEventListener("change", async (event) => {
+    const cantonId = event.target.value;
+    await cargarDistritos(cantonId);
+});
+
+// 📌 Cargar distritos
+async function cargarDistritos(cantonId, selectedDistrito) {
+    if (!cantonId) return;
+    const response = await fetch(`http://localhost:5000/distritos?canton=${cantonId}`);
+    const data = await response.json();
+    const distritoSelect = document.getElementById("distrito");
+
+    distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
+    data.forEach(distrito => {
+        const option = document.createElement("option");
+        option.value = distrito.id;
+        option.textContent = distrito.nombre;
+        if (distrito.id === selectedDistrito) option.selected = true;
+        distritoSelect.appendChild(option);
+    });
+}
+
+document.getElementById("perfil-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const storedUser = localStorage.getItem("usuario");
+    if (!storedUser) {
+        alert("Debes iniciar sesión primero.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const usuario = JSON.parse(storedUser);
+
+    // 📌 Capturar los valores actualizados del formulario
+    const updatedData = {
+        username: usuario.username, // Importante para identificar el usuario
+        nombre: document.getElementById("nombre").value.trim(),
+        apellido: document.getElementById("apellido").value.trim(),
+        tipoIdentificacion: document.getElementById("tipoIdentificacion").value,
+        identificacion: document.getElementById("identificacion").value.trim(),
+        fechaNacimiento: document.getElementById("fechaNacimiento").value,
+        sexo: document.getElementById("sexo").value,
+        direccion: document.getElementById("direccion").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        correo: document.getElementById("correo").value.trim(),
+        nombreTarjeta: document.getElementById("nombreTarjeta").value.trim(),
+        numeroTarjeta: document.getElementById("numeroTarjeta").value.trim(),
+        fechaVencimiento: document.getElementById("fechaVencimiento").value,
+        codigoSeguridad: document.getElementById("codigoSeguridad").value.trim(),
+        pais: document.getElementById("pais").value,
+        provincia: document.getElementById("provincia").value,
+        canton: document.getElementById("canton").value,
+        distrito: document.getElementById("distrito").value
+    };
+
+    console.log("📌 Datos a enviar para actualización:", updatedData); // Verifica los datos antes de enviarlos
+
+    try {
+        const response = await fetch("http://localhost:5000/perfil", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Perfil actualizado correctamente.");
+            window.location.href = "index.html"; // 🔄 Redirigir a index.html después de la actualización
+        } else {
+            alert("Error al actualizar el perfil: " + (data.error || "Error desconocido."));
+        }
+    } catch (error) {
+        console.error("❌ Error en la actualización:", error);
+        alert("Error de conexión con el servidor.");
+    }
+});

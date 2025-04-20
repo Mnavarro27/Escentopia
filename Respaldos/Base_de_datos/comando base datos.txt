@@ -1,0 +1,239 @@
+
+/*esto borra las tablas que tegan llave foranea */
+
+DECLARE @sql NVARCHAR(MAX) = '';
+
+SELECT @sql += 'ALTER TABLE ' + OBJECT_NAME(parent_object_id) + ' DROP CONSTRAINT ' + name + ';'
+FROM sys.foreign_keys
+WHERE referenced_object_id = OBJECT_ID('Distritos');
+
+EXEC sp_executesql @sql;
+
+DROP TABLE Distritos;
+
+
+-- 📌 Tabla de Países
+CREATE TABLE Paises (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL UNIQUE
+);
+
+
+-- 📌 Tabla de Provincias
+CREATE TABLE Provincias (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    pais_id INT NOT NULL,
+    FOREIGN KEY (pais_id) REFERENCES Paises(id) ON DELETE CASCADE
+);
+
+-- 📌 Tabla de Cantones
+CREATE TABLE Cantones (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    provincia_id INT NOT NULL,
+    FOREIGN KEY (provincia_id) REFERENCES Provincias(id) ON DELETE CASCADE
+);
+
+-- 📌 Tabla de Distritos
+CREATE TABLE Distritos (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    canton_id INT NOT NULL,
+    FOREIGN KEY (canton_id) REFERENCES Cantones(id) ON DELETE CASCADE
+);
+
+
+INSERT INTO Cantones (nombre, provincia_id) VALUES 
+-- 🇨🇷 Costa Rica
+('San José Central', (SELECT id FROM Provincias WHERE nombre = 'San José')),
+('Desamparados', (SELECT id FROM Provincias WHERE nombre = 'San José')),
+('Escazú', (SELECT id FROM Provincias WHERE nombre = 'San José')),
+('Goicoechea', (SELECT id FROM Provincias WHERE nombre = 'San José')),
+
+('San Carlos', (SELECT id FROM Provincias WHERE nombre = 'Alajuela')),
+('Grecia', (SELECT id FROM Provincias WHERE nombre = 'Alajuela')),
+('San Ramón', (SELECT id FROM Provincias WHERE nombre = 'Alajuela')),
+('Naranjo', (SELECT id FROM Provincias WHERE nombre = 'Alajuela')),
+
+('Cartago Central', (SELECT id FROM Provincias WHERE nombre = 'Cartago')),
+('La Unión', (SELECT id FROM Provincias WHERE nombre = 'Cartago')),
+('Paraíso', (SELECT id FROM Provincias WHERE nombre = 'Cartago')),
+('Turrialba', (SELECT id FROM Provincias WHERE nombre = 'Cartago')),
+
+('Heredia Central', (SELECT id FROM Provincias WHERE nombre = 'Heredia')),
+('San Isidro', (SELECT id FROM Provincias WHERE nombre = 'Heredia')),
+('Barva', (SELECT id FROM Provincias WHERE nombre = 'Heredia')),
+('Santa Bárbara', (SELECT id FROM Provincias WHERE nombre = 'Heredia')),
+
+-- 🇦🇷 Argentina
+('La Plata', (SELECT id FROM Provincias WHERE nombre = 'Buenos Aires')),
+('Mar del Plata', (SELECT id FROM Provincias WHERE nombre = 'Buenos Aires')),
+('Quilmes', (SELECT id FROM Provincias WHERE nombre = 'Buenos Aires')),
+('Tigre', (SELECT id FROM Provincias WHERE nombre = 'Buenos Aires')),
+
+('Córdoba Capital', (SELECT id FROM Provincias WHERE nombre = 'Córdoba')),
+('Villa María', (SELECT id FROM Provincias WHERE nombre = 'Córdoba')),
+('Río Cuarto', (SELECT id FROM Provincias WHERE nombre = 'Córdoba')),
+('Alta Gracia', (SELECT id FROM Provincias WHERE nombre = 'Córdoba')),
+
+('Santa Fe Capital', (SELECT id FROM Provincias WHERE nombre = 'Santa Fe')),
+('Rosario', (SELECT id FROM Provincias WHERE nombre = 'Santa Fe')),
+('Venado Tuerto', (SELECT id FROM Provincias WHERE nombre = 'Santa Fe')),
+('Rafaela', (SELECT id FROM Provincias WHERE nombre = 'Santa Fe')),
+
+('Mendoza Capital', (SELECT id FROM Provincias WHERE nombre = 'Mendoza')),
+('San Rafael', (SELECT id FROM Provincias WHERE nombre = 'Mendoza')),
+('Tunuyán', (SELECT id FROM Provincias WHERE nombre = 'Mendoza')),
+('Malargüe', (SELECT id FROM Provincias WHERE nombre = 'Mendoza')),
+
+-- 🇲🇽 México
+('Iztapalapa', (SELECT id FROM Provincias WHERE nombre = 'Ciudad de México')),
+('Coyoacán', (SELECT id FROM Provincias WHERE nombre = 'Ciudad de México')),
+('Benito Juárez', (SELECT id FROM Provincias WHERE nombre = 'Ciudad de México')),
+('Tlalpan', (SELECT id FROM Provincias WHERE nombre = 'Ciudad de México')),
+
+('Guadalajara', (SELECT id FROM Provincias WHERE nombre = 'Jalisco')),
+('Zapopan', (SELECT id FROM Provincias WHERE nombre = 'Jalisco')),
+('Tlaquepaque', (SELECT id FROM Provincias WHERE nombre = 'Jalisco')),
+('Puerto Vallarta', (SELECT id FROM Provincias WHERE nombre = 'Jalisco')),
+
+('Monterrey', (SELECT id FROM Provincias WHERE nombre = 'Nuevo León')),
+('San Nicolás de los Garza', (SELECT id FROM Provincias WHERE nombre = 'Nuevo León')),
+('Guadalupe', (SELECT id FROM Provincias WHERE nombre = 'Nuevo León')),
+('Apodaca', (SELECT id FROM Provincias WHERE nombre = 'Nuevo León')),
+
+('Puebla Capital', (SELECT id FROM Provincias WHERE nombre = 'Puebla')),
+('San Pedro Cholula', (SELECT id FROM Provincias WHERE nombre = 'Puebla')),
+('Atlixco', (SELECT id FROM Provincias WHERE nombre = 'Puebla')),
+('Tehuacán', (SELECT id FROM Provincias WHERE nombre = 'Puebla')),
+
+-- 🇸🇻 El Salvador
+('San Salvador Centro', (SELECT id FROM Provincias WHERE nombre = 'San Salvador')),
+('Soyapango', (SELECT id FROM Provincias WHERE nombre = 'San Salvador')),
+('Mejicanos', (SELECT id FROM Provincias WHERE nombre = 'San Salvador')),
+('Ilopango', (SELECT id FROM Provincias WHERE nombre = 'San Salvador')),
+
+('Santa Ana Centro', (SELECT id FROM Provincias WHERE nombre = 'Santa Ana')),
+('Metapán', (SELECT id FROM Provincias WHERE nombre = 'Santa Ana')),
+('Chalchuapa', (SELECT id FROM Provincias WHERE nombre = 'Santa Ana')),
+('Coatepeque', (SELECT id FROM Provincias WHERE nombre = 'Santa Ana')),
+
+('San Miguel Centro', (SELECT id FROM Provincias WHERE nombre = 'San Miguel')),
+('Chinameca', (SELECT id FROM Provincias WHERE nombre = 'San Miguel')),
+('Ciudad Barrios', (SELECT id FROM Provincias WHERE nombre = 'San Miguel')),
+('El Tránsito', (SELECT id FROM Provincias WHERE nombre = 'San Miguel')),
+
+('La Libertad Centro', (SELECT id FROM Provincias WHERE nombre = 'La Libertad')),
+('Santa Tecla', (SELECT id FROM Provincias WHERE nombre = 'La Libertad')),
+('Quezaltepeque', (SELECT id FROM Provincias WHERE nombre = 'La Libertad')),
+('Zaragoza', (SELECT id FROM Provincias WHERE nombre = 'La Libertad'));
+
+
+INSERT INTO Distritos (nombre, canton_id) VALUES 
+
+-- 🇨🇷 Costa Rica (San José)
+('Catedral', (SELECT id FROM Cantones WHERE nombre = 'San José Central')),
+('Zapote', (SELECT id FROM Cantones WHERE nombre = 'San José Central')),
+('San Francisco', (SELECT id FROM Cantones WHERE nombre = 'San José Central')),
+('Mata Redonda', (SELECT id FROM Cantones WHERE nombre = 'San José Central')),
+
+('Gravilias', (SELECT id FROM Cantones WHERE nombre = 'Desamparados')),
+('San Rafael', (SELECT id FROM Cantones WHERE nombre = 'Desamparados')),
+('Los Guido', (SELECT id FROM Cantones WHERE nombre = 'Desamparados')),
+('San Antonio', (SELECT id FROM Cantones WHERE nombre = 'Desamparados')),
+
+('Escazú Centro', (SELECT id FROM Cantones WHERE nombre = 'Escazú')),
+('San Rafael', (SELECT id FROM Cantones WHERE nombre = 'Escazú')),
+('San Antonio', (SELECT id FROM Cantones WHERE nombre = 'Escazú')),
+('Bello Horizonte', (SELECT id FROM Cantones WHERE nombre = 'Escazú')),
+
+('Guadalupe', (SELECT id FROM Cantones WHERE nombre = 'Goicoechea')),
+('Ipis', (SELECT id FROM Cantones WHERE nombre = 'Goicoechea')),
+('Mata de Plátano', (SELECT id FROM Cantones WHERE nombre = 'Goicoechea')),
+('Rancho Redondo', (SELECT id FROM Cantones WHERE nombre = 'Goicoechea')),
+
+-- 🇦🇷 Argentina (Buenos Aires)
+('La Boca', (SELECT id FROM Cantones WHERE nombre = 'La Plata')),
+('San Carlos', (SELECT id FROM Cantones WHERE nombre = 'La Plata')),
+('Los Hornos', (SELECT id FROM Cantones WHERE nombre = 'La Plata')),
+('Tolosa', (SELECT id FROM Cantones WHERE nombre = 'La Plata')),
+
+('Playa Grande', (SELECT id FROM Cantones WHERE nombre = 'Mar del Plata')),
+('Punta Mogotes', (SELECT id FROM Cantones WHERE nombre = 'Mar del Plata')),
+('Barrio Constitución', (SELECT id FROM Cantones WHERE nombre = 'Mar del Plata')),
+('Bosque Peralta Ramos', (SELECT id FROM Cantones WHERE nombre = 'Mar del Plata')),
+
+('Bernal', (SELECT id FROM Cantones WHERE nombre = 'Quilmes')),
+('Ezpeleta', (SELECT id FROM Cantones WHERE nombre = 'Quilmes')),
+('San Francisco Solano', (SELECT id FROM Cantones WHERE nombre = 'Quilmes')),
+('Villa La Florida', (SELECT id FROM Cantones WHERE nombre = 'Quilmes')),
+
+('Nordelta', (SELECT id FROM Cantones WHERE nombre = 'Tigre')),
+('Benavídez', (SELECT id FROM Cantones WHERE nombre = 'Tigre')),
+('Don Torcuato', (SELECT id FROM Cantones WHERE nombre = 'Tigre')),
+('El Talar', (SELECT id FROM Cantones WHERE nombre = 'Tigre')),
+
+-- 🇲🇽 México (Ciudad de México)
+('Centro Histórico', (SELECT id FROM Cantones WHERE nombre = 'Iztapalapa')),
+('San Andrés', (SELECT id FROM Cantones WHERE nombre = 'Iztapalapa')),
+('Santa María', (SELECT id FROM Cantones WHERE nombre = 'Iztapalapa')),
+('San Miguel', (SELECT id FROM Cantones WHERE nombre = 'Iztapalapa')),
+
+('Villa Coapa', (SELECT id FROM Cantones WHERE nombre = 'Coyoacán')),
+('Copilco', (SELECT id FROM Cantones WHERE nombre = 'Coyoacán')),
+('Santa Úrsula', (SELECT id FROM Cantones WHERE nombre = 'Coyoacán')),
+('Del Carmen', (SELECT id FROM Cantones WHERE nombre = 'Coyoacán')),
+
+('Narvarte', (SELECT id FROM Cantones WHERE nombre = 'Benito Juárez')),
+('Del Valle', (SELECT id FROM Cantones WHERE nombre = 'Benito Juárez')),
+('Mixcoac', (SELECT id FROM Cantones WHERE nombre = 'Benito Juárez')),
+('Nápoles', (SELECT id FROM Cantones WHERE nombre = 'Benito Juárez')),
+
+('San Pedro', (SELECT id FROM Cantones WHERE nombre = 'Tlalpan')),
+('Tlalpan Centro', (SELECT id FROM Cantones WHERE nombre = 'Tlalpan')),
+('Fuentes Brotantes', (SELECT id FROM Cantones WHERE nombre = 'Tlalpan')),
+('Miguel Hidalgo', (SELECT id FROM Cantones WHERE nombre = 'Tlalpan')),
+
+-- 🇸🇻 El Salvador (San Salvador)
+('Centro', (SELECT id FROM Cantones WHERE nombre = 'San Salvador Centro')),
+('Santa Anita', (SELECT id FROM Cantones WHERE nombre = 'San Salvador Centro')),
+('Barrio Lourdes', (SELECT id FROM Cantones WHERE nombre = 'San Salvador Centro')),
+('Barrio El Calvario', (SELECT id FROM Cantones WHERE nombre = 'San Salvador Centro')),
+
+('Las Margaritas', (SELECT id FROM Cantones WHERE nombre = 'Soyapango')),
+('Ciudad Credisa', (SELECT id FROM Cantones WHERE nombre = 'Soyapango')),
+('Las Cañas', (SELECT id FROM Cantones WHERE nombre = 'Soyapango')),
+('San Bartolo', (SELECT id FROM Cantones WHERE nombre = 'Soyapango')),
+
+('San Juan', (SELECT id FROM Cantones WHERE nombre = 'Mejicanos')),
+('San Roque', (SELECT id FROM Cantones WHERE nombre = 'Mejicanos')),
+('La Gloria', (SELECT id FROM Cantones WHERE nombre = 'Mejicanos')),
+('Montessori', (SELECT id FROM Cantones WHERE nombre = 'Mejicanos')),
+
+('El Salvador del Mundo', (SELECT id FROM Cantones WHERE nombre = 'Ilopango')),
+('Altavista', (SELECT id FROM Cantones WHERE nombre = 'Ilopango')),
+('San José', (SELECT id FROM Cantones WHERE nombre = 'Ilopango')),
+('Santa Lucía', (SELECT id FROM Cantones WHERE nombre = 'Ilopango'));
+
+
+
+
+
+/* esto elimina los 2 ultimos usuarios registrados */
+
+DELETE FROM Usuarios 
+WHERE id IN (
+    SELECT TOP 2 id FROM Usuarios 
+    ORDER BY id DESC
+);
+
+
+
+/*esto reinicia los valores de id */
+  DBCC CHECKIDENT ('Usuarios', RESEED);
+
+
+  /*elimina todos los usuarios creados y reinicia el id en 0*/
+  DELETE FROM Usuarios;
+DBCC CHECKIDENT ('Usuarios', RESEED, 0);

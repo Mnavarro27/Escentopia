@@ -1,0 +1,10 @@
+Mucha informacion en el registro de un nuevo usuario     
+En la pagina de bienvenida que sea la contraseña    
+Rotulacion de categorias       
+Rotulacion para ver promociones   
+Reseñas  footer 
+Color fondo   
+Historia de la marca,de donde nacio   
+Colocar la palabra salir. 
+no hay boton de regreso en el perfil 
+nombre  principal de la pagina falta que resalte, mayuscula.

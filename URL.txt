@@ -1,0 +1,14 @@
+ejecutar paginas 
+
+http://localhost:5000/views/templates/index.html
+
+cambiar el index por las demas paginas y el templates por static si senecesita ver los demas datos
+
+
+http://localhost:5000/views/static/manifest.json
+
+manifiesto 
+servidor normal
+
+python app.py
+

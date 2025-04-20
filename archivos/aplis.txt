@@ -1,0 +1,75 @@
+/*-----------------------------metodos get-----------------------------*/
+http://localhost:5000/perfil?username=Mauricio
+
+http://localhost:5000/productos
+
+http://localhost:5000/usuarios
+
+http://localhost:5000/paises
+
+http://localhost:5000/provincias?pais=1
+
+http://localhost:5000/cantones?provincia=1
+
+http://localhost:5000/distritos?canton=1
+
+/*-----------------------------metodos put-----------------------------*/
+
+http://localhost:5000/registro 
+
+
+/*-----------------------------apli del banco-----------------------------*/
+
+http://localhost:5000/api/exchange-rate?fecha_inicio=13/11/2024&fecha_final=13/11/2024
+
+
+/*---------------------------banco simulado -------------------------------*/
+
+get 
+
+http://localhost:5000/api/simulacion/tarjetas
+
+post 
+
+http://localhost:5000/api/simulacion/validar-pago
+
+
+
+headers
+
+key: Content-Type    &  Value: application/json
+
+
+Body: raw JSON
+
+{
+  "numero": "1234567812345678",
+  "fecha_vencimiento": "12/26",
+  "monto": 100
+}
+
+
+
+/*---------------------------registro civil simulado -------------------------------*/
+con los numero de cedula 
+
+http://localhost:5000/api/registro-civil/consultar-usuario/101010101   
+
+
+
+
+
+✅  CONSUMO de las apis
+Ministerio de Salud
+GET http://localhost:5000/api/servicios/salud/componente/alcohol
+
+
+Servicio de Transporte
+GET http://localhost:5000/api/servicios/transporte/disponibilidad?provincia=San%20José&canton=Escazú&distrito=San%20Rafael
+
+Proveedores de destinatarios
+GET http://localhost:5000/api/servicios/recipientes/vidrio
+
+
+
+

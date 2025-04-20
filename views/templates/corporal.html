@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corporal - Escentopia</title>
+  
+  <!-- IMPORTANTE: DEFINIR FUNCIONES GLOBALES ANTES DE CUALQUIER OTRO CÓDIGO -->
+  <script>
+    // Definir funciones globalmente antes de cualquier otro código
+    function agregarAlCarrito(id, nombre, precio) {
+      console.log("agregarAlCarrito llamado con:", id, nombre, precio);
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const existe = carrito.find(item => item.id === id);
+      if (existe) {
+        existe.cantidad++;
+      } else {
+        carrito.push({ id, nombre, precio, cantidad: 1 });
+      }
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      alert("Producto agregado al carrito!");
+    }
+
+    function mostrarDetalles(id, nombre, precio, descripcion) {
+      console.log("mostrarDetalles llamado con:", id, nombre, precio, descripcion);
+      document.getElementById("modalTitulo").innerText = nombre;
+      document.getElementById("modalPrecio").innerText = `Precio: ${precio.toFixed(2)}`;
+      document.getElementById("modalDescripcion").innerText = descripcion;
+      document.getElementById("modalDetalles").style.display = "block";
+    }
+
+    // Exponer funciones al ámbito global explícitamente
+    window.agregarAlCarrito = agregarAlCarrito;
+    window.mostrarDetalles = mostrarDetalles;
+  </script>
+  
+  <!-- Estilos y manifest -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Material Icons y Google Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Nav responsivo -->
+  <script defer src="/static/js/nav.js"></script>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <nav class="nav-bar">
+    <button class="menu-button" id="menu-button">&#9776;</button>
+    <h1 class="logo">Escentopia</h1>
+    <div class="nav-buttons">
+      <a href="/perfil.html" class="icon-button"><i class="material-icons">person</i></a>
+      <a href="/carrito.html" class="icon-button"><i class="material-icons">shopping_cart</i></a>
+      <a href="/login.html" class="icon-button"><i class="material-icons">exit_to_app</i></a>
+    </div>
+  </nav>
+
+  <!-- Menú desplegable -->
+  <div class="menu-dropdown" id="menu-dropdown">
+    <ul>
+      <li><a href="/promociones.html">Ver Promociones</a></li>
+      <li><a href="/Informacion.html">Quiénes somos</a></li>
+    </ul>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    <h2 class="welcome-title">Categorías</h2>
+    <div class="category-menu">
+      <a href="/index.html">Hogar</a>
+      <a href="/auto.html">Auto</a>
+      <a href="/corporal.html" class="active-category">Corporal</a>
+      <a href="/fragancia.html">Fragancias</a>
+    </div>
+    <h3 class="section-title">Fragancias Corporales</h3>
+    <div id="productos-container"></div>
+    <p id="ultimo-update" style="font-size: .9em; color: #555; text-align: center;"></p>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <!-- Sobre nosotros -->
+      <div class="footer-section about">
+        <h3>Sobre Escentopia</h3>
+        <p>Escentopia es tu destino para encontrar las mejores fragancias y aromas para tu hogar, auto y uso personal.</p>
+        <div class="social-links">
+          <a href="#"><i class="material-icons">facebook</i></a>
+          <a href="#"><i class="material-icons">alternate_email</i></a>
+          <a href="#"><i class="material-icons">photo_camera</i></a>
+        </div>
+      </div>
+      <!-- Enlaces rápidos -->
+      <div class="footer-section links">
+        <h3>Enlaces Rápidos</h3>
+        <ul>
+          <li><a href="/index.html">Inicio</a></li>
+          <li><a href="/promociones.html">Promociones</a></li>
+          <li><a href="/Informacion.html">Quiénes Somos</a></li>
+          <li><a href="/perfil.html">Mi Perfil</a></li>
+          <li><a href="/carrito.html">Carrito</a></li>
+        </ul>
+      </div>
+      <!-- Contacto -->
+      <div class="footer-section contact">
+        <h3>Contáctanos</h3>
+        <div class="contact-item"><i class="material-icons">location_on</i> San José, Costa Rica</div>
+        <div class="contact-item"><i class="material-icons">phone</i> +506 2222-3333</div>
+        <div class="contact-item"><i class="material-icons">email</i> info@escentopia.com</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Escentopia - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- Modal de detalles -->
+  <div id="modalDetalles" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitulo"></h2>
+      <p id="modalPrecio"></p>
+      <p id="modalDescripcion"></p>
+    </div>
+  </div>
+
+  <!-- ======= SCRIPTS DE PRODUCTOS & CARRO ======= -->
+  <script>
+    // Cerrar modal
+    document.addEventListener("DOMContentLoaded", () => {
+      document
+        .querySelector("#modalDetalles .close")
+        .addEventListener("click", () => {
+          document.getElementById("modalDetalles").style.display = "none";
+        });
+    });
+
+    // IDs de productos para esta página (Corporal: 5 y 6)
+    const PRODUCT_IDS_FOR_PAGE = [5, 6];
+
+    // Cargar y renderizar productos desde la API
+    function cargarProductos() {
+      $.ajax({
+        url: "/productos",
+        method: "GET",
+        dataType: "json",
+        cache: false, // Importante: deshabilitar caché para esta petición
+        success: function(productos) {
+          // Filtrar productos por ID para esta página
+          const productosFiltrados = productos.filter(p => PRODUCT_IDS_FOR_PAGE.includes(p.id));
+          
+          const cont = document.getElementById("productos-container");
+          cont.innerHTML = "";
+          
+          productosFiltrados.forEach(function(p) {
+            // Crear la tarjeta de producto
+            const card = document.createElement("div");
+            card.className = "product-card";
+            
+            // Verificar si la URL comienza con http o https
+            const imagenUrl = p.imagen && p.imagen.startsWith('http') 
+              ? p.imagen 
+              : `/static/images/default.jpg`;
+            
+            // IMPORTANTE: Usar event listeners en lugar de onclick
+            card.innerHTML = `
+              <img src="${imagenUrl}" alt="${p.nombre}" class="product-image" onerror="this.src='/static/images/default.jpg'">
+              <h4>${p.nombre}</h4>
+              <p>Precio: ${p.precio.toFixed(2)}</p>
+              <div class="button-group">
+                <button class="buy-button" data-id="${p.id}" data-nombre="${p.nombre.replace(/"/g, '&quot;')}" data-precio="${p.precio}">Comprar</button>
+                <button class="details-button" data-id="${p.id}" data-nombre="${p.nombre.replace(/"/g, '&quot;')}" data-precio="${p.precio}">Detalles</button>
+              </div>
+            `;
+            
+            // Agregar event listeners después de crear el HTML
+            const buyButton = card.querySelector('.buy-button');
+            buyButton.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              const nombre = this.dataset.nombre;
+              const precio = parseFloat(this.dataset.precio);
+              console.log("Click en comprar:", id, nombre, precio);
+              agregarAlCarrito(id, nombre, precio);
+            });
+            
+            const detailsButton = card.querySelector('.details-button');
+            detailsButton.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              const nombre = this.dataset.nombre;
+              const precio = parseFloat(this.dataset.precio);
+              console.log("Click en detalles:", id, nombre, precio);
+              const descripcion = id === 5
+                ? "💦 Loción Corporal de Lavanda es una fórmula hidratante que nutre la piel mientras proporciona un aroma relajante y duradero. Ideal para usar después del baño o antes de dormir."
+                : "🌿 Splash Corporal de Té Verde combina notas frescas y herbales que revitalizan los sentidos. Su fórmula ligera es perfecta para uso diario, dejando un aroma sutil y refrescante.";
+              mostrarDetalles(id, nombre, precio, descripcion);
+            });
+            
+            cont.appendChild(card);
+          });
+          
+          document.getElementById("ultimo-update").innerText =
+            "Última actualización: " + new Date().toLocaleTimeString();
+        },
+        error: function(err) {
+          console.error("Error al obtener productos:", err);
+          // En caso de error, cargar datos de respaldo
+          cargarProductosRespaldo();
+        }
+      });
+    }
+    
+    // Función de respaldo con datos estáticos
+    function cargarProductosRespaldo() {
+      console.log("Usando datos de respaldo para productos");
+      const productosDePrueba = [
+        {
+          id: 5,
+          nombre: "Loción Corporal de Lavanda",
+          precio: 22.99,
+          imagen: "https://i.imgur.com/ejemplo5.jpg"
+        },
+        {
+          id: 6,
+          nombre: "Splash Corporal de Té Verde",
+          precio: 19.99,
+          imagen: "https://i.imgur.com/ejemplo6.jpg"
+        }
+      ];
+      
+      const cont = document.getElementById("productos-container");
+      cont.innerHTML = "";
+      
+      productosDePrueba.forEach(function(p) {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        
+        // IMPORTANTE: Usar event listeners en lugar de onclick
+        card.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}" class="product-image" onerror="this.src='/static/images/default.jpg'">
+          <h4>${p.nombre}</h4>
+          <p>Precio: ${p.precio.toFixed(2)}</p>
+          <div class="button-group">
+            <button class="buy-button" data-id="${p.id}" data-nombre="${p.nombre.replace(/"/g, '&quot;')}" data-precio="${p.precio}">Comprar</button>
+            <button class="details-button" data-id="${p.id}" data-nombre="${p.nombre.replace(/"/g, '&quot;')}" data-precio="${p.precio}">Detalles</button>
+          </div>
+        `;
+        
+        // Agregar event listeners después de crear el HTML
+        const buyButton = card.querySelector('.buy-button');
+        buyButton.addEventListener('click', function() {
+          const id = parseInt(this.dataset.id);
+          const nombre = this.dataset.nombre;
+          const precio = parseFloat(this.dataset.precio);
+          console.log("Click en comprar (respaldo):", id, nombre, precio);
+          agregarAlCarrito(id, nombre, precio);
+        });
+        
+        const detailsButton = card.querySelector('.details-button');
+        detailsButton.addEventListener('click', function() {
+          const id = parseInt(this.dataset.id);
+          const nombre = this.dataset.nombre;
+          const precio = parseFloat(this.dataset.precio);
+          console.log("Click en detalles (respaldo):", id, nombre, precio);
+          const descripcion = id === 5
+            ? "💦 Loción Corporal de Lavanda es una fórmula hidratante que nutre la piel mientras proporciona un aroma relajante y duradero. Ideal para usar después del baño o antes de dormir."
+            : "🌿 Splash Corporal de Té Verde combina notas frescas y herbales que revitalizan los sentidos. Su fórmula ligera es perfecta para uso diario, dejando un aroma sutil y refrescante.";
+          mostrarDetalles(id, nombre, precio, descripcion);
+        });
+        
+        cont.appendChild(card);
+      });
+      
+      document.getElementById("ultimo-update").innerText =
+        "Última actualización (datos locales): " + new Date().toLocaleTimeString();
+    }
+
+    // Inicializar la página
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM cargado - Verificando funciones globales:");
+      console.log("agregarAlCarrito disponible:", typeof window.agregarAlCarrito === "function");
+      console.log("mostrarDetalles disponible:", typeof window.mostrarDetalles === "function");
+      
+      // Cargar productos inicialmente
+      cargarProductos();
+      
+      // Configurar intervalo de actualización
+      setInterval(cargarProductos, 30000); // Actualizar cada 30 segundos
+    });
+  </script>
+
+  <!-- Service Worker PWA -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/static/sw-v2.js")
+          .then(reg => console.log("SW registrado en:", reg.scope))
+          .catch(err => console.error("Error registrando SW:", err));
+      });
+    }
+  </script>
+</body>
+</html>

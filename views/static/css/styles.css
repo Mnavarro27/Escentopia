@@ -1,0 +1,911 @@
+/* ========================================
+   Reset y Configuración Global
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+  background-attachment: fixed;
+  color: #333;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ========================================
+   Barra de Navegación y Encabezados
+======================================== */
+.nav-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(90deg, #1a237e 0%, #283593 50%, #303f9f 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+.icon-button {
+  text-decoration: none;
+  color: rgb(252, 252, 252);
+  font-size: 28px;
+  padding: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.icon-button:hover {
+  color: #64b5f6;
+  transform: translateY(-2px);
+}
+.icon-button:active {
+  transform: translateY(0);
+}
+
+
+/* ========================================
+   Menu desplegable
+======================================== */
+.menu-dropdown {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  width: 220px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.menu-dropdown.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.menu-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-dropdown li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menu-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.menu-dropdown li a {
+  display: block;
+  padding: 14px 18px;
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menu-dropdown li a:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  padding-left: 24px;
+  color: #2563eb;
+}
+
+.menu-dropdown li a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 18px;
+  width: 0;
+  height: 2px;
+  background-color: #2563eb;
+  transition: width 0.3s ease;
+}
+
+.menu-dropdown li a:hover::after {
+  width: calc(100% - 36px);
+}
+
+/* ========================================
+   Contenedores y Títulos
+======================================== */
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: auto;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.perfil-container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-title {
+  font-size: 28px;
+  color: #1a237e;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.welcome-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #1a237e, #5c6bc0);
+  border-radius: 3px;
+}
+
+.welcome-text,
+.section-title {
+  text-align: center;
+  color: #1a237e;
+}
+
+.section-title {
+  margin: 30px 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 15px;
+}
+
+.section-title::before,
+.section-title::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #5c6bc0);
+}
+
+.section-title::before {
+  left: -30px;
+}
+
+.section-title::after {
+  right: -30px;
+  background: linear-gradient(90deg, #5c6bc0, transparent);
+}
+
+/* ========================================
+   Menú de Categorías
+======================================== */
+.category-menu {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 40px 0 30px;
+  padding: 15px 0;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.category-menu::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #1a237e, transparent);
+}
+
+.category-menu a {
+  text-decoration: none;
+  color: #6b7280;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.category-menu a:hover {
+  color: #1a237e;
+  background-color: rgba(92, 107, 192, 0.1);
+  transform: translateY(-3px);
+}
+
+.category-menu a.active-category {
+  color: #fff;
+  background-color: #1a237e;
+  box-shadow: 0 4px 8px rgba(26, 35, 126, 0.3);
+}
+
+.category-menu a::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: #1a237e;
+  transition: width 0.3s ease;
+}
+
+.category-menu a:hover::after {
+  width: 70%;
+}
+
+.category-menu a.active-category::after {
+  width: 0;
+}
+
+/* ========================================
+   Tarjeta del Producto
+======================================== */
+#productos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  margin: 0;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  border-color: rgba(26, 35, 126, 0.3);
+}
+
+.product-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  z-index: -1;
+}
+
+.product-card:hover::before {
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-card h4 {
+  font-size: 22px;
+  color: #1a237e;
+  margin-bottom: 12px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.product-card h4::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #1a237e, #5c6bc0);
+  transition: width 0.3s ease;
+}
+
+.product-card:hover h4::after {
+  width: 80px;
+}
+
+.product-card p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.buy-button {
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 8px rgba(26, 35, 126, 0.3);
+}
+
+.buy-button:hover {
+  background: linear-gradient(135deg, #3949ab, #1a237e);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(26, 35, 126, 0.4);
+}
+
+.buy-button:active {
+  transform: translateY(-1px);
+}
+
+.details-button {
+  background-color: transparent;
+  color: #1a237e;
+  padding: 12px 24px;
+  border: 1px solid #1a237e;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.details-button:hover {
+  background-color: rgba(26, 35, 126, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.details-button:active {
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   Modal (Ventana Emergente)
+======================================== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  margin: 10% auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  transform: scale(0.9);
+  opacity: 0;
+  animation: modalOpen 0.4s forwards;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes modalOpen {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1a237e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close:hover {
+  color: #e53935;
+  background-color: rgba(229, 57, 53, 0.1);
+  transform: rotate(90deg);
+}
+
+#modalTitulo {
+  color: #1a237e;
+  font-size: 26px;
+  margin-bottom: 15px;
+  font-weight: 700;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+#modalPrecio {
+  font-size: 22px;
+  color: #1a237e;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+#modalDescripcion {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #555;
+  text-align: left;
+  padding: 0 10px;
+}
+
+/* ========================================
+   Footer
+======================================== */
+.site-footer {
+  background: linear-gradient(90deg, #1a237e 0%, #283593 50%, #303f9f 100%);
+  color: #fff;
+  padding: 0;
+  margin-top: 50px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.footer-section.about p {
+  margin-bottom: 20px;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+.footer-section.links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section.links li {
+  margin-bottom: 12px;
+}
+
+.footer-section.links a {
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+  position: relative;
+  padding-left: 15px;
+}
+
+.footer-section.links a::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  transition: transform 0.3s ease;
+}
+
+.footer-section.links a:hover {
+  color: #64b5f6;
+  transform: translateX(5px);
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-item i {
+  font-size: 20px;
+  color: #64b5f6;
+}
+
+.footer-bottom {
+  background: rgba(0, 0, 0, 0.2);
+  text-align: center;
+  padding: 15px 0;
+  font-size: 14px;
+}
+
+/* ========================================
+   Animaciones y Efectos Adicionales
+======================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container > * {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+#ultimo-update {
+  margin-top: 30px;
+  font-size: 0.9em;
+  color: #777;
+  text-align: center;
+  font-style: italic;
+}
+
+/* ========================================
+   Responsividad
+======================================== */
+@media (max-width: 1024px) {
+  .container {
+    padding: 20px;
+  }
+
+  #productos-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    flex-direction: row;
+    padding: 12px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .category-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .category-menu a {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  #productos-container {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+  }
+
+  .product-card {
+    padding: 20px;
+  }
+
+  .product-image {
+    height: 180px;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 15% auto;
+    padding: 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 30px 20px;
+  }
+
+  .footer-section {
+    text-align: center;
+  }
+
+  .footer-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .footer-section.links a {
+    padding-left: 0;
+  }
+
+  .footer-section.links a::before {
+    display: none;
+  }
+
+  .contact-item {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-title {
+    font-size: 22px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .category-menu {
+    gap: 10px;
+  }
+
+  .category-menu a {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
+  .buy-button,
+  .details-button {
+    width: 100%;
+    padding: 10px 16px;
+  }
+
+  #productos-container {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card h4 {
+    font-size: 20px;
+  }
+
+  .product-card p {
+    font-size: 16px;
+  }
+
+  .modal-content {
+    margin: 20% auto;
+    padding: 15px;
+  }
+
+  #modalTitulo {
+    font-size: 22px;
+  }
+
+  #modalPrecio {
+    font-size: 18px;
+  }
+
+  .footer-content {
+    padding: 20px;
+  }
+}
+
+#productos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+/* Estilos específicos para la cuadrícula de productos */
+.grid-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 30px !important;
+  margin-top: 30px;
+}
+
+/* Estilos para mensajes de error o sin productos */
+.no-products,
+.error-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  color: #e53935;
+}
+
+.no-products {
+  color: #666;
+}
+
+/* ocultamos el hamburger en desktop */
+/* —————————————————————————————
+   Botón “hamburguesa” siempre visible
+   ————————————————————————————— */
+   .menu-button {
+    display: inline-block;   /* ¡siempre visible! */
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1001;           /* encima del dropdown */
+  }
+  
+  /* —————————————————————————————
+     Dropdown “Ver Promociones”
+     ————————————————————————————— */
+  .menu-dropdown {
+    position: absolute;
+    top: 56px;               /* justo debajo del nav-bar */
+    left: 10px;
+    width: auto;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+  }
+  .menu-dropdown.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  
+  /* —————————————————————————————
+     Asegurar que los iconos siempre estén a la vista
+     ————————————————————————————— */
+  .nav-buttons {
+    display: flex;            /* siempre mostramos */
+    gap: 15px;
+    z-index: 1001;            /* encima de todo */
+  }
+  
+  /* —————————————————————————————
+     Mobile tweaks: full width dropdown
+     ————————————————————————————— */
+  @media (max-width: 768px) {
+    .menu-dropdown {
+      left: 0;
+      width: 100%;
+      top: 56px;              /* ajusta si tu nav-bar es más alto */
+    }
+    .menu-dropdown ul li a {
+      padding: 16px;
+    }
+  }
+  

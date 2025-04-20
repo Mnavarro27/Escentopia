@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación 2FA</title>
+  <link rel="stylesheet" href="/static/css/verificar-2fa.css">
+  <link rel="manifest" href="/manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#4CAF50">
+  <link rel="apple-touch-icon" href="/static/images/icon-192x192.png">
+  <style>
+    /* Estilos mejorados con animaciones */
+    :root {
+      --primary-color: #4CAF50;
+      --primary-dark: #3e8e41;
+      --accent-color: #FF9800;
+      --error-color: #e74c3c;
+      --success-color: #27ae60;
+      --text-color: #333;
+      --bg-color: #f5f5f5;
+      --card-bg: white;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    }
+    
+    .verificacion-container {
+      background-color: var(--card-bg);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .verificacion-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    h2 {
+      color: var(--text-color);
+      margin-bottom: 15px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    p {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    .input-container {
+      position: relative;
+      margin: 30px 0;
+    }
+    
+    #codigo-2fa {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      letter-spacing: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+      background-color: #f9f9f9;
+      transition: all 0.3s;
+    }
+    
+    #codigo-2fa:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      outline: none;
+      background-color: white;
+    }
+    
+    #verificar-2fa-button {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    
+    #verificar-2fa-button:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    #verificar-2fa-button:active {
+      transform: translateY(0);
+    }
+    
+    #verificar-2fa-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+    
+    #verificar-2fa-button:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+    
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(20, 20);
+        opacity: 0;
+      }
+    }
+    
+    #mensaje-error {
+      color: var(--error-color);
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 4px solid var(--error-color);
+      display: none;
+      animation: shake 0.5s ease-in-out;
+      text-align: left;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .mensaje-exito {
+      color: var(--success-color);
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: rgba(39, 174, 96, 0.1);
+      border-left: 4px solid var(--success-color);
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .digit-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 30px 0;
+    }
+    
+    .digit {
+      width: 50px;
+      height: 60px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 24px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-color);
+      background-color: #f9f9f9;
+      transition: all 0.3s;
+    }
+    
+    .digit:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      outline: none;
+      background-color: white;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+    }
+    
+    .timer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+    
+    .timer span {
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+
+    .timer-container {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="verificacion-container">
+    <h2>Verificación de Seguridad</h2>
+    <p>Ingrese el código de 6 dígitos enviado a su correo electrónico para completar el inicio de sesión.</p>
+    
+    <input type="text" id="codigo-2fa" placeholder="000000" maxlength="6" autocomplete="off">
+    
+    <button id="verificar-2fa-button">Verificar Código</button>
+    
+    <div class="timer-container">
+      El código expirará en <span class="timer" id="countdown">10:00</span>
+    </div>
+    
+    <div id="mensaje-error"></div>
+    <div class="mensaje-exito" id="mensaje-exito">Código verificado correctamente. Redirigiendo...</div>
+  </div>
+  
+  <script src="/static/js/verificar-2fa.js"></script>
+  <script>
+    // Contador regresivo
+    function startCountdown() {
+      let minutes = 10;
+      let seconds = 0;
+      const countdownEl = document.getElementById('countdown');
+      
+      const interval = setInterval(() => {
+        if (seconds === 0) {
+          if (minutes === 0) {
+            clearInterval(interval);
+            return;
+          }
+          minutes--;
+          seconds = 59;
+        } else {
+          seconds--;
+        }
+        
+        countdownEl.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+      }, 1000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      startCountdown();
+      
+      // Enfoque automático en el input
+      document.getElementById('codigo-2fa').focus();
+    });
+  </script>
+</body>
+</html>
