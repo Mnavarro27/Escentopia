@@ -3,4 +3,5 @@ flask-cors
 bcrypt
 pyodbc
 python-dotenv
+requests
 
