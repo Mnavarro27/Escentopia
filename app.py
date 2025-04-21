@@ -1,4 +1,5 @@
-import os,json,base64,random,datetime,bcrypt,requests,ssl,smtplib,pyodbc,pytds
+import os,json,base64,random,datetime,bcrypt,requests,ssl,smtplib,pyodbc,pytds,traceback
+
 
 from flask import (
   Flask, request, jsonify,
@@ -296,30 +297,30 @@ def perfil():
             return jsonify({"error": "Error servidor"}), 500
 
 # Login
+# Login
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+    data = request.get_json() or {}
+    username = data.get('username', '')
+    password = data.get('password', '')
     ip = request.remote_addr
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id, nombre, username, password, intentos_fallidos, bloqueado_hasta
-            FROM Usuarios WHERE username=?
+              FROM Usuarios WHERE username=?
         """, username)
         row = cursor.fetchone()
         if not row:
             log_audit(username, ip, 0, "No encontrado")
-            conn.close()
             return jsonify({"error": "Credenciales incorrectas"}), 401
 
         user_id, nombre, user_username, hashed, attempts, blocked_until = row
         now = datetime.datetime.now()
         if blocked_until and blocked_until > now:
             log_audit(username, ip, 0, "Bloqueado")
-            conn.close()
             return jsonify({"error": "Cuenta bloqueada"}), 403
 
         if not bcrypt.checkpw(password.encode(), hashed.encode()):
@@ -337,7 +338,6 @@ def login():
                 )
             conn.commit()
             log_audit(username, ip, 0, "Contraseña incorrecta")
-            conn.close()
             return jsonify({"error": f"Credenciales incorrectas. Restan {3-attempts} intentos"}), 401
 
         # Éxito
@@ -347,11 +347,23 @@ def login():
         )
         conn.commit()
         log_audit(username, ip, 1, "Éxito")
-        conn.close()
         return jsonify({"usuario": {"id": user_id, "nombre": nombre, "username": user_username}})
+
     except Exception as e:
-        print("Error login:", e)
-        return jsonify({"error": "Error servidor"}), 500
+        # Imprime el trace en los logs de Render
+        traceback.print_exc()
+        # Devuelve el error y el stack‐trace en la respuesta para debug
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }), 500
+    finally:
+        try:
+            conn.close()
+        except:
+            pass
+
 
 # Geografía
 @app.route('/paises', methods=['GET'])
