@@ -26,4 +26,6 @@ function agregarAlCarrito(id, nombre, precio) {
     typeof agregarAlCarrito === "function",
     typeof mostrarDetalles === "function",
   )
+
+  
   

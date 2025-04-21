@@ -95,6 +95,7 @@ async function solicitarCodigo2FA(username) {
     }
   });
   
+  
   // Mostrar/ocultar contraseña
   function togglePassword() {
     const passwordInput = document.getElementById("password");

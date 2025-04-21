@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
+  
   // Función para mostrar u ocultar la contraseña
   function togglePassword() {
     const inp = document.getElementById("password");

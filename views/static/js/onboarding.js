@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Clave específica para este usuario
   const flagKey = `onboardingCompleted_${username}`
 
+  
   // Verificar si el usuario ya completó el onboarding
   if (localStorage.getItem(flagKey) !== "true") {
     console.log("Redirigiendo a onboarding para:", username)

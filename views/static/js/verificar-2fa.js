@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarError("Por favor, ingresa el código completo de 6 dígitos.")
       return
     }
+    
 
     // Mostrar estado de carga
     const textoOriginal = verificarBtn.textContent

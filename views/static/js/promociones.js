@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+
 // Función para agregar la promoción al carrito y redirigir a carrito.html
 function comprarPromocion() {
   let promocion = window.promocionDatos;

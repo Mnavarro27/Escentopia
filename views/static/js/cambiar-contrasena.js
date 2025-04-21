@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    
     try {
       const response = await fetch("/api/recuperacion/cambiar-contrasena", {
         method: "POST",

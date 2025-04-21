@@ -7,6 +7,7 @@ async function iniciarPagoPaypal(monto) {
             },
             body: JSON.stringify({ monto })
         });
+        
 
         const data = await response.json();
         if (response.ok && data.redirectUrl) {

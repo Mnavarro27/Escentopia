@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   
     const usuario = JSON.parse(storedUser)
+    
   
     try {
       const response = await fetch(`http://localhost:5000/perfil?username=${encodeURIComponent(usuario.username)}`)

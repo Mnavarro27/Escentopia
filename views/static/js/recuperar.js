@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarMensaje("El código debe tener 6 dígitos.")
         return
       }
+      
 
       // Mostrar estado de carga
       verificarCodigoBtn.disabled = true

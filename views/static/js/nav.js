@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "login.html";
   });
 
+  
   // Destacar categoría activa
   const currentPage   = window.location.pathname.split("/").pop();
   document.querySelectorAll(".category-menu a")
