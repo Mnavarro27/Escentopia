@@ -494,6 +494,17 @@ def outbound_ip():
     ip = requests.get('https://api.ipify.org').text
     return jsonify({"outbound_ip": ip})
 
+@app.route("/_db-test")
+def db_test():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return jsonify({"status": "ok", "msg": "Conexión a la DB exitosa"}), 200
+    except Exception as e:
+        # Devolvemos el texto del error para que aparezca en los logs y en la respuesta HTTP
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+
 
 # ─── Arranque de la app ─────────────────────────────────────────────────────────
 if __name__ == '__main__':
