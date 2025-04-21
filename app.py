@@ -46,17 +46,11 @@ app.register_blueprint(autenticacion_bp, url_prefix='/api/autenticacion')
 @app.route('/')
 @app.route('/<page>.html')
 def serve_page(page='index'):
-  # Renderizar la plantilla
   html = render_template(f'{page}.html')
-  
-  # Crear una respuesta para poder modificar headers
   response = make_response(html)
-  
-  # Añadir headers para evitar caché
   response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
   response.headers['Pragma'] = 'no-cache'
   response.headers['Expires'] = '0'
-  
   return response
 
 # ─── PWA: manifest.json & Service Worker ───────────────────────────────────────
@@ -74,21 +68,25 @@ def serve_image(filename):
   return send_from_directory('images', filename)
 
 # ─── Configuración de la base de datos ─────────────────────────────────────────
-db_config = {
-  'driver': '{ODBC Driver 17 for SQL Server}',
-  'server': os.getenv("DB_SERVER", "mauricio-escentopia.database.windows.net"),
-  'database': os.getenv("DB_NAME", "EscentopiaDB"),
-  'uid': os.getenv("DB_USER", "escentopiadmin"),
-  'pwd': os.getenv("DB_PASS", "escentopia27*")
-}
+# Las variables de entorno deben configurarse en Render: DB_SERVER, DB_PORT, DB_NAME, DB_USER, DB_PASS
 
 def get_db_connection():
+  driver   = "{ODBC Driver 17 for SQL Server}"
+  server   = os.getenv('DB_SERVER')
+  port     = os.getenv('DB_PORT', '1433')
+  database = os.getenv('DB_NAME')
+  uid      = os.getenv('DB_USER')
+  pwd      = os.getenv('DB_PASS')
+
   conn_str = (
-      f"DRIVER={db_config['driver']};"
-      f"SERVER={db_config['server']};"
-      f"DATABASE={db_config['database']};"
-      f"UID={db_config['uid']};"
-      f"PWD={db_config['pwd']}"
+      f"DRIVER={driver};"
+      f"SERVER={server},{port};"
+      f"DATABASE={database};"
+      f"UID={uid};"
+      f"PWD={pwd};"
+      "Encrypt=yes;"
+      "TrustServerCertificate=no;"
+      "Connection Timeout=30;"
   )
   return pyodbc.connect(conn_str)
 
@@ -110,7 +108,6 @@ def log_audit(username, ip, success, reason):
       conn.close()
   except Exception as e:
       print("Error auditando acceso:", e)
-
 # ─── Endpoints de API ──────────────────────────────────────────────────────────
 
 # Rutas para 2FA (para compatibilidad)
