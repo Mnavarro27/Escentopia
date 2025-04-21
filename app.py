@@ -1,13 +1,5 @@
-import os
-import json
-import base64
-import random
-import datetime
-import ssl
-import smtplib
-import pyodbc
-import bcrypt
-import requests
+import os,json,base64,random,datetime,bcrypt,requests,ssl,smtplib,pyodbc,pytds
+
 from flask import (
   Flask, request, jsonify,
   send_from_directory, render_template,
@@ -72,24 +64,31 @@ def serve_image(filename):
 # Las variables de entorno deben configurarse en Render: DB_SERVER, DB_PORT, DB_NAME, DB_USER, DB_PASS
 
 def get_db_connection():
-  driver   = "{ODBC Driver 17 for SQL Server}"
-  server   = os.getenv('DB_SERVER')
-  port     = os.getenv('DB_PORT', '1433')
-  database = os.getenv('DB_NAME')
-  uid      = os.getenv('DB_USER')
-  pwd      = os.getenv('DB_PASS')
+    """
+    Conecta a Azure SQL usando el driver python-tds para evitar dependencias ODBC.
+    Variables de entorno requeridas:
+    - DB_SERVER
+    - DB_PORT (opcional, por defecto 1433)
+    - DB_NAME
+    - DB_USER
+    - DB_PASS
+    """
+    server = os.getenv('DB_SERVER')
+    port = int(os.getenv('DB_PORT', '1433'))
+    database = os.getenv('DB_NAME')
+    user = os.getenv('DB_USER')
+    password = os.getenv('DB_PASS')
 
-  conn_str = (
-      f"DRIVER={driver};"
-      f"SERVER={server},{port};"
-      f"DATABASE={database};"
-      f"UID={uid};"
-      f"PWD={pwd};"
-      "Encrypt=yes;"
-      "TrustServerCertificate=no;"
-      "Connection Timeout=30;"
-  )
-  return pyodbc.connect(conn_str)
+    # Conexión básica sin parámetros no soportados (host/encrypted) por python-tds
+    return pytds.connect(
+        server=server,
+        port=port,
+        database=database,
+        user=user,
+        password=password,
+        timeout=30,
+        tds_version=1946157060  # Equivale a TDS 7.4
+    )
 
 def buffer_to_base64(buffer):
   if buffer:
