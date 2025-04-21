@@ -14,6 +14,7 @@ def get_connection():
         "UID=sa;"
         "PWD=AdminM27"
     )
+    
 
 @registro_bp.route("/consultar-usuario/<cedula>", methods=["GET"])
 def consultar_usuario(cedula):

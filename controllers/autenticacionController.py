@@ -143,6 +143,7 @@ def registro():
 
     # 2) Hashear contraseña
     hashed = bcrypt.hashpw(data['password'].encode(), bcrypt.gensalt()).decode()
+    
 
     # 3) Valores por defecto para columnas NOT NULL
     apellido            = data.get('apellido')            or ""

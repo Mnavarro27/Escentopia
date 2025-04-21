@@ -27,3 +27,4 @@ def exchange_rate():
             "venta":  tipo_cambio.get("venta",  "0.00")
         }
     }), 200
+

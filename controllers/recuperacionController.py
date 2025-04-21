@@ -137,6 +137,7 @@ def verificar_pregunta():
     pregunta = data.get('pregunta')
     respuesta = data.get('respuesta')
     
+    
     if not username or not pregunta or not respuesta:
         return jsonify({"error": "Faltan datos requeridos"}), 400
     

@@ -35,6 +35,7 @@ def get_exchange_rate(fecha_inicio, fecha_final, indicador="317", nombre="Mi Nom
         'SOAPAction': 'http://ws.sdde.bccr.fi.cr/ObtenerIndicadoresEconomicosXML'
     }
     
+    
     try:
         response = requests.post(BCCR_ENDPOINT, data=xml_data, headers=headers, timeout=10)
         response.raise_for_status()

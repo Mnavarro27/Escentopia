@@ -15,6 +15,7 @@ CORS(paypal_bp)
 PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID')
 PAYPAL_SECRET = os.environ.get('PAYPAL_SECRET')
 
+
 # Debug temporal para verificar si las credenciales se están leyendo
 print("CLIENT_ID:", PAYPAL_CLIENT_ID)
 print("SECRET:", PAYPAL_SECRET[:4] + "****")  # Solo muestra los primeros 4 caracteres

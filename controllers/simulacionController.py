@@ -82,3 +82,4 @@ def obtener_tarjetas():
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
+        

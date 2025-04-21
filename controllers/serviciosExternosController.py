@@ -118,3 +118,5 @@ def agregar_recipiente():
         return jsonify({"mensaje": "Recipiente agregado correctamente"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    

@@ -17,6 +17,7 @@ def exchange_rate():
     fecha_inicio = request.args.get('fecha_inicio', '13/11/2024')
     fecha_final = request.args.get('fecha_final', '13/11/2024')
     
+    
     rates, error = get_exchange_rates(fecha_inicio, fecha_final)
     if error:
         return jsonify({"error": error}), 500
