@@ -28,6 +28,7 @@ app = Flask(
 )
 CORS(app)
 
+
 # Registrar blueprints
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(simulacion_bp, url_prefix='/api/simulacion')
