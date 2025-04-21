@@ -65,21 +65,27 @@ def serve_image(filename):
 
 def get_db_connection():
     """
-    Conecta a Azure SQL usando el driver python-tds para evitar dependencias ODBC.
-    Variables de entorno requeridas:
-    - DB_SERVER
-    - DB_PORT (opcional, por defecto 1433)
-    - DB_NAME
-    - DB_USER
-    - DB_PASS
+    Conecta a Azure SQL usando el driver python-tds con cifrado TLS.
+    Variables de entorno:
+      - DB_SERVER
+      - DB_PORT
+      - DB_NAME
+      - DB_USER
+      - DB_PASS
+    Requiere `pyOpenSSL` en requirements.txt para TLS.
     """
+    import os
+    import pytds
+
     server = os.getenv('DB_SERVER')
     port = int(os.getenv('DB_PORT', '1433'))
     database = os.getenv('DB_NAME')
     user = os.getenv('DB_USER')
     password = os.getenv('DB_PASS')
 
-    # Conexión básica sin parámetros no soportados (host/encrypted) por python-tds
+    # Usar el bundle de CA del sistema para habilitar TLS
+    cafile = '/etc/ssl/certs/ca-certificates.crt'
+
     return pytds.connect(
         server=server,
         port=port,
@@ -87,8 +93,11 @@ def get_db_connection():
         user=user,
         password=password,
         timeout=30,
-        tds_version=1946157060  # Equivale a TDS 7.4
+        tds_version=1946157060,
+        cafile=cafile,
+        validate_host=False
     )
+
 
 def buffer_to_base64(buffer):
   if buffer:
@@ -495,13 +504,25 @@ def outbound_ip():
 
 @app.route("/_db-test")
 def db_test():
+    server = os.getenv("DB_SERVER")
+    port   = os.getenv("DB_PORT")
     try:
         conn = get_db_connection()
         conn.close()
-        return jsonify({"status": "ok", "msg": "Conexión a la DB exitosa"}), 200
+        return jsonify({
+            "status": "ok",
+            "msg": "Conexión a la DB exitosa",
+            "server": server,
+            "port": port
+        }), 200
     except Exception as e:
-        # Devolvemos el texto del error para que aparezca en los logs y en la respuesta HTTP
-        return jsonify({"status": "error", "error": str(e)}), 500
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "server": server,
+            "port": port
+        }), 500
+    
 
 
 

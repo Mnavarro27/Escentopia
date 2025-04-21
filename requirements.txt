@@ -5,4 +5,4 @@ pyodbc
 python-dotenv
 requests
 python-tds
-
+pyOpenSSL
