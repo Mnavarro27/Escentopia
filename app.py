@@ -7,6 +7,7 @@ import ssl
 import smtplib
 import pyodbc
 import bcrypt
+import requests
 from flask import (
   Flask, request, jsonify,
   send_from_directory, render_template,
@@ -484,6 +485,15 @@ def actualizar_onboarding():
     except Exception as e:
         print("Error al actualizar estado de onboarding:", e)
         return jsonify({"error": "Error al actualizar estado de onboarding"}), 500
+    
+    import requests
+
+@app.route('/_outbound-ip')
+def outbound_ip():
+    # Hacemos una petición a un servicio externo para que nos devuelva nuestra IP pública
+    ip = requests.get('https://api.ipify.org').text
+    return jsonify({"outbound_ip": ip})
+
 
 # ─── Arranque de la app ─────────────────────────────────────────────────────────
 if __name__ == '__main__':
