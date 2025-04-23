@@ -1,6 +1,6 @@
 async function iniciarPagoPaypal(monto) {
     try {
-        const response = await fetch('http://localhost:5000/api/paypal/create-payment', {
+        const response = await fetch('/api/paypal/create-payment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const response = await fetch("http://localhost:5000/productos");
+    const response = await fetch("/productos");
     const productos = await response.json();
 
     const promoContainer = document.getElementById("promociones-container");
