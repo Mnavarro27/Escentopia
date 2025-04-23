@@ -1001,3 +1001,174 @@ body {
     padding: 4px;
   }
 }
+
+/* Estilos específicos para mejorar la responsividad de la página de inicio */
+
+/* Ajustes generales para móviles */
+@media (max-width: 768px) {
+  /* Ajustes para el contenedor principal */
+  .container {
+    padding: 15px 10px;
+  }
+
+  /* Ajustes para el título de categorías */
+  .categorias-title {
+    font-size: 20px;
+    margin: 15px 0;
+  }
+
+  /* Ajustes para el menú de categorías */
+  .category-menu {
+    gap: 8px;
+    margin: 20px 0;
+    padding: 10px 0;
+    justify-content: center;
+  }
+
+  .category-menu a {
+    padding: 6px 10px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* Ajustes para el título de fragancias */
+  .fragancias-title {
+    font-size: 18px;
+    margin: 20px 0;
+    padding: 0 10px;
+    text-align: center;
+  }
+
+  /* Ajustes para el contenedor de productos */
+  #productos-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 5px;
+  }
+
+  /* Ajustes para las tarjetas de producto */
+  .product-card {
+    padding: 15px;
+    margin: 0 auto;
+    max-width: 280px;
+  }
+
+  .product-image {
+    height: 160px;
+  }
+
+  .product-card h4 {
+    font-size: 18px;
+  }
+
+  .product-card p {
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
+
+  /* Ajustes para los botones */
+  .button-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .buy-button,
+  .details-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* Ajustes específicos para pantallas muy pequeñas */
+@media (max-width: 360px) {
+  .category-menu {
+    gap: 5px;
+  }
+
+  .category-menu a {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .product-card {
+    padding: 12px;
+    max-width: 250px;
+  }
+
+  .product-image {
+    height: 140px;
+  }
+
+  .product-card h4 {
+    font-size: 16px;
+  }
+
+  .product-card p {
+    font-size: 14px;
+  }
+}
+
+/* Ajustes para tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  #productos-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .product-card {
+    max-width: none;
+  }
+}
+
+/* Ajustes para la navegación en móvil */
+@media (max-width: 768px) {
+  .nav-bar {
+    padding: 10px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .icon-button {
+    font-size: 22px;
+    padding: 5px;
+  }
+
+  .menu-button {
+    font-size: 22px;
+  }
+
+  /* Asegurar que el menú desplegable ocupe todo el ancho */
+  .menu-dropdown.active {
+    width: 100%;
+    left: 0;
+    border-radius: 0 0 8px 8px;
+  }
+}
+
+/* Ajustes para el espaciado vertical */
+@media (max-width: 768px) {
+  .welcome-title {
+    margin-top: 10px;
+  }
+
+  .section-title {
+    margin: 20px 0 15px;
+  }
+
+  .section-title::before,
+  .section-title::after {
+    width: 20px;
+  }
+
+  .section-title::before {
+    left: -20px;
+  }
+
+  .section-title::after {
+    right: -20px;
+  }
+}
+
