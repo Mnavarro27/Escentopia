@@ -2,7 +2,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_cors import CORS
 from decimal import Decimal
-import random,pyodbc
+import random, pyodbc
 import smtplib
 import pytds
 import ssl
@@ -45,7 +45,7 @@ def get_db_connection():
 @simulacion_bp.route("/validar-pago", methods=["POST"])
 def validar_pago():
     data = request.json
-    print("🔍 Datos recibidos:", data)  # <-- AGREGAR ESTO
+    print("🔍 Datos recibidos:", data)
 
     numero = data.get("numero")
     fecha_vencimiento = data.get("fecha_vencimiento")
@@ -54,13 +54,17 @@ def validar_pago():
     if not numero or not fecha_vencimiento or not monto:
         return jsonify({"error": "Faltan datos"}), 400
 
+    conn = None
     try:
         conn = get_db_connection()
+        if not conn:
+            return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+            
         cursor = conn.cursor()
 
         cursor.execute("""
             SELECT saldo, estado FROM tarjeta 
-            WHERE numero_tarjeta = ? AND fecha_vencimiento = ?
+            WHERE numero_tarjeta = %s AND fecha_vencimiento = %s
         """, (numero, fecha_vencimiento))
 
         row = cursor.fetchone()
@@ -75,24 +79,28 @@ def validar_pago():
             return jsonify({"validacion": "rechazada", "motivo": "Fondos insuficientes"}), 402
 
         # Descontar el saldo simulado
-
         nuevo_saldo = saldo - Decimal(str(monto))
 
-        cursor.execute("UPDATE tarjeta SET saldo = ? WHERE numero_tarjeta = ?", (nuevo_saldo, numero))
+        cursor.execute("UPDATE tarjeta SET saldo = %s WHERE numero_tarjeta = %s", (nuevo_saldo, numero))
         conn.commit()
 
-        return jsonify({"validacion": "aprobada", "nuevo_saldo": nuevo_saldo}), 200
+        return jsonify({"validacion": "aprobada", "nuevo_saldo": float(nuevo_saldo)}), 200
 
     except Exception as e:
-        print("❌ ERROR BACKEND:", e)  # <-- AGREGAR ESTO TAMBIÉN
+        print("❌ ERROR BACKEND:", e)
         return jsonify({"error": str(e)}), 500
     finally:
-        conn.close()
+        if conn:
+            conn.close()
   
 @simulacion_bp.route("/tarjetas", methods=["GET"])
 def obtener_tarjetas():
+    conn = None
     try:
         conn = get_db_connection()
+        if not conn:
+            return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+            
         cursor = conn.cursor()
         cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 'activa'")
         tarjetas = []
@@ -106,5 +114,5 @@ def obtener_tarjetas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        conn.close()
-        
+        if conn:
+            conn.close()

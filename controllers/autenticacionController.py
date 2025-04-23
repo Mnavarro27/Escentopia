@@ -45,7 +45,7 @@ def get_db_connection():
         traceback.print_exc()
         return None
 
-def enviar_correo(destinatario, asunto, contenido):
+def enviar_correo(destinatario, asunto, contenido, contenido_html=None):
     """Envía un correo electrónico usando SMTP"""
     try:
         # Configuración del servidor SMTP
@@ -62,6 +62,11 @@ def enviar_correo(destinatario, asunto, contenido):
         # Crear mensaje
         msg = EmailMessage()
         msg.set_content(contenido)
+        
+        # Si hay contenido HTML, añadirlo como alternativa
+        if contenido_html:
+            msg.add_alternative(contenido_html, subtype='html')
+            
         msg['Subject'] = asunto
         msg['From'] = smtp_user
         msg['To'] = destinatario
@@ -97,13 +102,13 @@ def solicitar_2fa():
                 return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
                 
             cursor = conn.cursor()
-            cursor.execute("SELECT correo FROM Usuarios WHERE username = %s", (username,))
+            cursor.execute("SELECT correo, nombre FROM Usuarios WHERE username = %s", (username,))
             row = cursor.fetchone()
             
             if not row:
                 return jsonify({"error": "Usuario no encontrado"}), 404
             
-            correo = row[0]
+            correo, nombre = row
         finally:
             if conn:
                 conn.close()
@@ -114,10 +119,9 @@ def solicitar_2fa():
         # Almacenar código (en producción usaría Redis con TTL)
         codigos_2fa[username] = codigo
         
-        # Enviar correo con código
-        asunto = "Código de verificación Escentopia"
-        contenido = f"""
-        Hola {username},
+        # Contenido de texto plano
+        contenido_texto = f"""
+        Hola {nombre or username},
         
         Tu código de verificación para Escentopia es: {codigo}
         
@@ -127,7 +131,46 @@ def solicitar_2fa():
         Equipo Escentopia
         """
         
-        if enviar_correo(correo, asunto, contenido):
+        # Contenido HTML mejorado
+        contenido_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background-color: #1a237e; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }}
+                .content {{ background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; }}
+                .code {{ font-size: 32px; font-weight: bold; color: #1a237e; letter-spacing: 5px; text-align: center; margin: 20px 0; }}
+                .footer {{ margin-top: 20px; font-size: 12px; color: #777; text-align: center; }}
+                .note {{ background-color: #e8eaf6; padding: 10px; border-left: 4px solid #3949ab; margin: 15px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Verificación de Seguridad</h1>
+                </div>
+                <div class="content">
+                    <p>Hola <strong>{nombre or username}</strong>,</p>
+                    <p>Recibimos una solicitud para iniciar sesión en tu cuenta de Escentopia. Utiliza el siguiente código para completar el proceso:</p>
+                    <div class="code">{codigo}</div>
+                    <p>Este código expirará en 10 minutos por razones de seguridad.</p>
+                    <div class="note">
+                        <p><strong>Nota de seguridad:</strong> Si no intentaste iniciar sesión, alguien podría estar intentando acceder a tu cuenta. Te recomendamos ignorar este mensaje y verificar la seguridad de tu cuenta.</p>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>© 2025 Escentopia. Todos los derechos reservados.</p>
+                    <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Enviar correo con ambos formatos
+        if enviar_correo(correo, "Código de verificación Escentopia", contenido_texto, contenido_html):
             return jsonify({"success": True, "message": "Código enviado correctamente"}), 200
         else:
             return jsonify({"error": "Error al enviar el correo"}), 500

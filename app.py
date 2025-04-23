@@ -253,7 +253,7 @@ def perfil():
                 WHERE username=%s
                 """,
                 (
-                  data.get('nombre'), data.get('apellido'), data.get('telefono'), data.get('correo'), data.get('dirección'),
+                  data.get('nombre'), data.get('apellido'), data.get('telefono'), data.get('correo'), data.get('direccion'),
                   data.get('tipoIdentificacion'), data.get('identificacion'), data.get('fechaNacimiento'), data.get('sexo'),
                   data.get('nombreTarjeta'), data.get('numeroTarjeta'), data.get('fechaVencimiento'), data.get('codigoSeguridad'),
                   data.get('pais'), data.get('provincia'), data.get('canton'), data.get('distrito'),
@@ -266,6 +266,7 @@ def perfil():
         except Exception as e:
             print("Error perfil PUT:", e)
             return jsonify({"error": "Error servidor"}), 500
+
 
 # Login
 @app.route('/login', methods=['POST'])
