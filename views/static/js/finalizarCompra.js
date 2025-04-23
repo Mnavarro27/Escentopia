@@ -6,18 +6,28 @@ function getUrlParameter(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
   }
   
-  // Función para formatear fecha de vencimiento
+  // Función para formatear fecha de vencimiento a MM/YY
   function formatearFechaVencimiento(fecha) {
-    // Si la fecha ya está en formato MM/YYYY, devolverla tal cual
-    if (typeof fecha === "string" && /^\d{2}\/\d{4}$/.test(fecha)) {
+    // Si la fecha ya está en formato MM/YY, devolverla tal cual
+    if (typeof fecha === "string" && /^\d{2}\/\d{2}$/.test(fecha)) {
       return fecha
     }
   
-    // Si es una fecha completa, convertirla a MM/YYYY
+    // Si es una fecha completa, convertirla a MM/YY
     try {
       const fechaObj = new Date(fecha)
       if (!isNaN(fechaObj.getTime())) {
-        return `${String(fechaObj.getMonth() + 1).padStart(2, "0")}/${fechaObj.getFullYear()}`
+        const mes = String(fechaObj.getMonth() + 1).padStart(2, "0")
+        const año = String(fechaObj.getFullYear()).slice(-2)
+        return `${mes}/${año}`
+      }
+  
+      // Si es un string con formato MM/YYYY, convertirlo a MM/YY
+      if (typeof fecha === "string") {
+        const match = fecha.match(/(\d{2})\/(\d{4})/)
+        if (match) {
+          return `${match[1]}/${match[2].slice(-2)}`
+        }
       }
     } catch (e) {
       console.error("Error al formatear fecha:", e)
@@ -47,7 +57,7 @@ function getUrlParameter(name) {
   
       // Agregar tarjetas al select
       tarjetas.forEach((tarjeta) => {
-        // Formatear la fecha de vencimiento si es necesario
+        // Formatear la fecha de vencimiento a MM/YY
         const fechaFormateada = formatearFechaVencimiento(tarjeta.fecha_vencimiento)
   
         const option = document.createElement("option")
@@ -101,7 +111,7 @@ function getUrlParameter(name) {
     try {
       const tarjeta = JSON.parse(selectedValue)
   
-      // Formatear la fecha de vencimiento si es necesario
+      // Formatear la fecha de vencimiento a MM/YY
       const fechaFormateada = formatearFechaVencimiento(tarjeta.fecha)
   
       // Deshabilitar botón mientras se procesa

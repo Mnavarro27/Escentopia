@@ -12,6 +12,7 @@ import sys
 import traceback
 from dotenv import load_dotenv
 import datetime
+import re
 
 load_dotenv()
 
@@ -45,6 +46,50 @@ def get_db_connection():
         traceback.print_exc()
         return None
 
+def formatear_fecha_vencimiento(fecha):
+    """Convierte cualquier formato de fecha a MM/YY"""
+    try:
+        # Si ya está en formato MM/YY, devolverlo tal cual
+        if isinstance(fecha, str) and re.match(r'^\d{2}/\d{2}$', fecha):
+            return fecha
+            
+        # Si es una fecha completa, convertirla a MM/YY
+        if isinstance(fecha, datetime.datetime):
+            return fecha.strftime('%m/%y')
+            
+        # Si es una cadena con formato completo, intentar convertirla
+        if isinstance(fecha, str):
+            # Intentar varios formatos
+            if "GMT" in fecha:
+                # Formato: "Mon, 01 Nov 2027 00:00:00 GMT"
+                try:
+                    fecha_dt = datetime.datetime.strptime(fecha, "%a, %d %b %Y %H:%M:%S GMT")
+                    return fecha_dt.strftime('%m/%y')
+                except ValueError:
+                    pass
+                    
+            # Intentar extraer mes y año con regex
+            match = re.search(r'(\d{1,2})[/-](\d{2,4})', fecha)
+            if match:
+                mes = match.group(1).zfill(2)  # Asegurar 2 dígitos
+                año = match.group(2)
+                # Si el año tiene 4 dígitos, tomar solo los últimos 2
+                if len(año) == 4:
+                    año = año[2:]
+                return f"{mes}/{año}"
+                
+            # Intentar con formato MM/YYYY
+            match = re.search(r'(\d{1,2})/(\d{4})', fecha)
+            if match:
+                mes = match.group(1).zfill(2)
+                año = match.group(2)[2:]  # Tomar solo los últimos 2 dígitos
+                return f"{mes}/{año}"
+    except Exception as e:
+        print(f"Error al formatear fecha: {e}")
+    
+    # Si no se pudo formatear, devolver un formato por defecto
+    return fecha
+
 @simulacion_bp.route("/tarjetas", methods=["GET"])
 def obtener_tarjetas():
     conn = None
@@ -58,10 +103,8 @@ def obtener_tarjetas():
         cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 1")
         tarjetas = []
         for row in cursor.fetchall():
-            # Formatear la fecha para que sea más simple
-            fecha_vencimiento = row[1]
-            if isinstance(fecha_vencimiento, datetime.datetime):
-                fecha_vencimiento = fecha_vencimiento.strftime('%m/%Y')
+            # Formatear la fecha para que sea MM/YY
+            fecha_vencimiento = formatear_fecha_vencimiento(row[1])
             
             tarjetas.append({
                 "numero_tarjeta": row[0],
@@ -89,29 +132,8 @@ def validar_pago():
     if not numero or not fecha_vencimiento or not monto:
         return jsonify({"error": "Faltan datos"}), 400
 
-    # Procesar la fecha de vencimiento si viene en formato GMT
-    try:
-        if isinstance(fecha_vencimiento, str) and "GMT" in fecha_vencimiento:
-            # Intentar parsear la fecha completa
-            try:
-                # Formato: "Mon, 01 Nov 2027 00:00:00 GMT"
-                fecha_dt = datetime.datetime.strptime(fecha_vencimiento, "%a, %d %b %Y %H:%M:%S GMT")
-                fecha_vencimiento = fecha_dt.strftime('%m/%Y')
-            except ValueError:
-                # Si falla, intentar extraer mes y año con un enfoque más simple
-                import re
-                match = re.search(r'\d{2} (\w{3}) (\d{4})', fecha_vencimiento)
-                if match:
-                    mes = match.group(1)
-                    año = match.group(2)
-                    # Convertir mes de texto a número
-                    meses = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", 
-                             "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
-                    fecha_vencimiento = f"{meses.get(mes, '01')}/{año}"
-    except Exception as e:
-        print(f"Error al procesar fecha: {e}")
-        # Si hay error, mantener la fecha original
-
+    # Formatear la fecha a MM/YY
+    fecha_vencimiento = formatear_fecha_vencimiento(fecha_vencimiento)
     print(f"Fecha procesada: {fecha_vencimiento}")
 
     conn = None
@@ -122,18 +144,37 @@ def validar_pago():
             
         cursor = conn.cursor()
         
-        # Consulta más flexible para la fecha de vencimiento
+        # Consulta para buscar la tarjeta con la fecha formateada
         cursor.execute("""
             SELECT saldo, estado FROM tarjeta 
             WHERE numero_tarjeta = %s AND 
                   (fecha_vencimiento = %s OR 
-                   CONVERT(VARCHAR(7), fecha_vencimiento, 101) = %s OR
-                   CONVERT(VARCHAR(7), fecha_vencimiento, 110) = %s)
-        """, (numero, fecha_vencimiento, fecha_vencimiento, fecha_vencimiento))
+                   FORMAT(fecha_vencimiento, 'MM/yy') = %s)
+        """, (numero, fecha_vencimiento, fecha_vencimiento))
 
         row = cursor.fetchone()
         if not row:
-            return jsonify({"validacion": "rechazada", "motivo": "Tarjeta no encontrada"}), 404
+            # Si no se encuentra, intentar con una consulta más flexible
+            print("Tarjeta no encontrada con fecha exacta, intentando búsqueda flexible...")
+            
+            # Extraer mes y año de la fecha
+            match = re.match(r'(\d{2})/(\d{2})', fecha_vencimiento)
+            if match:
+                mes = match.group(1)
+                año = match.group(2)
+                
+                # Buscar tarjetas donde el mes y año coincidan
+                cursor.execute("""
+                    SELECT saldo, estado FROM tarjeta 
+                    WHERE numero_tarjeta = %s AND 
+                          MONTH(fecha_vencimiento) = %s AND 
+                          (YEAR(fecha_vencimiento) %% 100) = %s
+                """, (numero, int(mes), int(año)))
+                
+                row = cursor.fetchone()
+                
+            if not row:
+                return jsonify({"validacion": "rechazada", "motivo": "Tarjeta no encontrada"}), 404
 
         saldo, estado = row
         # Verificar el estado como BIT (1 = activa, 0 = inactiva)
