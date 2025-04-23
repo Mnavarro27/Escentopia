@@ -2,7 +2,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_cors import CORS
 from decimal import Decimal
-import random, pyodbc
+import random
 import smtplib
 import pytds
 import ssl
@@ -12,7 +12,10 @@ import sys
 import traceback
 from dotenv import load_dotenv
 
-simulacion_bp = Blueprint('simulacion', __name__)
+load_dotenv()
+
+# Crear el blueprint sin tilde en el nombre
+simulacion_bp = Blueprint('simulacion', __name__, url_prefix='/api/simulacion')
 CORS(simulacion_bp)
 
 def get_db_connection():
@@ -41,7 +44,33 @@ def get_db_connection():
         traceback.print_exc()
         return None
 
-# controllers/simulacionController.py
+@simulacion_bp.route("/tarjetas", methods=["GET"])
+def obtener_tarjetas():
+    conn = None
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+            
+        cursor = conn.cursor()
+        # Modificar la consulta para usar BIT en lugar de 'activa'
+        cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 1")
+        tarjetas = []
+        for row in cursor.fetchall():
+            tarjetas.append({
+                "numero_tarjeta": row[0],
+                "fecha_vencimiento": row[1],
+                "propietario": row[2]
+            })
+        return jsonify(tarjetas)
+    except Exception as e:
+        print(f"Error al obtener tarjetas: {e}")
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
+
 @simulacion_bp.route("/validar-pago", methods=["POST"])
 def validar_pago():
     data = request.json
@@ -61,7 +90,7 @@ def validar_pago():
             return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
             
         cursor = conn.cursor()
-
+        # Modificar la consulta para usar BIT en lugar de 'activa'
         cursor.execute("""
             SELECT saldo, estado FROM tarjeta 
             WHERE numero_tarjeta = %s AND fecha_vencimiento = %s
@@ -72,7 +101,8 @@ def validar_pago():
             return jsonify({"validacion": "rechazada", "motivo": "Tarjeta no encontrada"}), 404
 
         saldo, estado = row
-        if estado != "activa":
+        # Verificar el estado como BIT (1 = activa, 0 = inactiva)
+        if estado != 1:
             return jsonify({"validacion": "rechazada", "motivo": "Tarjeta inactiva"}), 403
 
         if saldo < float(monto):
@@ -88,30 +118,7 @@ def validar_pago():
 
     except Exception as e:
         print("❌ ERROR BACKEND:", e)
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
-  
-@simulacion_bp.route("/tarjetas", methods=["GET"])
-def obtener_tarjetas():
-    conn = None
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
-            
-        cursor = conn.cursor()
-        cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 'activa'")
-        tarjetas = []
-        for row in cursor.fetchall():
-            tarjetas.append({
-                "numero_tarjeta": row[0],
-                "fecha_vencimiento": row[1],
-                "propietario": row[2]
-            })
-        return jsonify(tarjetas)
-    except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:

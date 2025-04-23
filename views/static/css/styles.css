@@ -30,6 +30,7 @@ body {
   padding: 16px;
   background: linear-gradient(90deg, #1a237e 0%, #283593 50%, #303f9f 100%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
 }
 .logo {
   position: absolute;
@@ -60,7 +61,6 @@ body {
 .icon-button:active {
   transform: translateY(0);
 }
-
 
 /* ========================================
    Menu desplegable
@@ -143,6 +143,7 @@ body {
   position: relative;
   z-index: 1;
   flex: 1;
+  width: 100%;
 }
 
 .container::before {
@@ -851,61 +852,152 @@ body {
 
 /* ocultamos el hamburger en desktop */
 /* —————————————————————————————
-   Botón “hamburguesa” siempre visible
+   Botón "hamburguesa" siempre visible
    ————————————————————————————— */
-   .menu-button {
-    display: inline-block;   /* ¡siempre visible! */
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #fff;
-    cursor: pointer;
-    z-index: 1001;           /* encima del dropdown */
-  }
-  
-  /* —————————————————————————————
-     Dropdown “Ver Promociones”
+.menu-button {
+  display: inline-block; /* ¡siempre visible! */
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1001; /* encima del dropdown */
+}
+
+/* —————————————————————————————
+     Dropdown "Ver Promociones"
      ————————————————————————————— */
-  .menu-dropdown {
-    position: absolute;
-    top: 56px;               /* justo debajo del nav-bar */
-    left: 10px;
-    width: auto;
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
-  }
-  .menu-dropdown.active {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-  
-  /* —————————————————————————————
+.menu-dropdown {
+  position: absolute;
+  top: 56px; /* justo debajo del nav-bar */
+  left: 10px;
+  width: auto;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+.menu-dropdown.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* —————————————————————————————
      Asegurar que los iconos siempre estén a la vista
      ————————————————————————————— */
-  .nav-buttons {
-    display: flex;            /* siempre mostramos */
-    gap: 15px;
-    z-index: 1001;            /* encima de todo */
-  }
-  
-  /* —————————————————————————————
+.nav-buttons {
+  display: flex; /* siempre mostramos */
+  gap: 15px;
+  z-index: 1001; /* encima de todo */
+}
+
+/* —————————————————————————————
      Mobile tweaks: full width dropdown
      ————————————————————————————— */
-  @media (max-width: 768px) {
-    .menu-dropdown {
-      left: 0;
-      width: 100%;
-      top: 56px;              /* ajusta si tu nav-bar es más alto */
-    }
-    .menu-dropdown ul li a {
-      padding: 16px;
-    }
+@media (max-width: 768px) {
+  .menu-dropdown {
+    left: 0;
+    width: 100%;
+    top: 56px; /* ajusta si tu nav-bar es más alto */
   }
-  
+  .menu-dropdown ul li a {
+    padding: 16px;
+  }
+}
+
+/* Mejoras adicionales de responsividad */
+@media (max-width: 480px) {
+  .product-card {
+    padding: 15px;
+  }
+
+  .product-image {
+    height: 160px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .buy-button,
+  .details-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .welcome-title {
+    font-size: 20px;
+  }
+
+  .nav-bar {
+    padding: 10px;
+  }
+
+  .icon-button {
+    font-size: 24px;
+    padding: 6px;
+  }
+
+  .menu-button {
+    font-size: 24px;
+  }
+
+  .footer-section h3 {
+    font-size: 18px;
+  }
+
+  .footer-section p,
+  .footer-section a {
+    font-size: 14px;
+  }
+
+  .footer-bottom p {
+    font-size: 12px;
+  }
+}
+
+/* Mejoras para tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .product-card {
+    padding: 20px;
+  }
+
+  .category-menu {
+    justify-content: space-around;
+  }
+
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mejoras para pantallas pequeñas */
+@media (max-width: 320px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .product-card h4 {
+    font-size: 18px;
+  }
+
+  .product-card p {
+    font-size: 14px;
+  }
+
+  .nav-buttons {
+    gap: 8px;
+  }
+
+  .icon-button {
+    font-size: 20px;
+    padding: 4px;
+  }
+}
