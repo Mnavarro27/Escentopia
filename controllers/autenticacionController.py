@@ -3,6 +3,8 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_cors import CORS
 import random
 import smtplib
+import pytds
+import ssl
 from email.message import EmailMessage
 import os
 import sys
@@ -18,25 +20,26 @@ CORS(autenticacion_bp)
 codigos_2fa = {}
 
 def get_db_connection():
-    """Obtiene una conexión a la base de datos"""
+    """Obtiene una conexión a la base de datos usando pytds"""
     try:
-        # Importamos la función aquí para evitar importación circular
-        import pyodbc
-        
         server = os.getenv('DB_SERVER')
+        port = int(os.getenv('DB_PORT', '1433'))
         database = os.getenv('DB_NAME')
-        username = os.getenv('DB_USER')
+        user = os.getenv('DB_USER')
         password = os.getenv('DB_PASS')
-        
-        conn_str = (
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={server};"
-            f"DATABASE={database};"
-            f"UID={username};"
-            f"PWD={password}"
+        cafile = '/etc/ssl/certs/ca-certificates.crt'
+
+        return pytds.connect(
+            server=server,
+            port=port,
+            database=database,
+            user=user,
+            password=password,
+            timeout=30,
+            tds_version=1946157060,
+            cafile=cafile,
+            validate_host=False
         )
-        
-        return pyodbc.connect(conn_str)
     except Exception as e:
         print(f"Error de conexión a la base de datos: {e}")
         traceback.print_exc()
@@ -48,8 +51,8 @@ def enviar_correo(destinatario, asunto, contenido):
         # Configuración del servidor SMTP
         smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
         smtp_port = int(os.getenv('SMTP_PORT', 587))
-        smtp_user = os.getenv('SMTP_USER')
-        smtp_pass = os.getenv('SMTP_PASS')
+        smtp_user = os.getenv('EMAIL_USER')  # Usar EMAIL_USER en lugar de SMTP_USER
+        smtp_pass = os.getenv('EMAIL_PASS')  # Usar EMAIL_PASS en lugar de SMTP_PASS
         
         # Verificar que tenemos las credenciales
         if not smtp_user or not smtp_pass:
@@ -64,8 +67,9 @@ def enviar_correo(destinatario, asunto, contenido):
         msg['To'] = destinatario
         
         # Enviar correo
+        context = ssl.create_default_context()
         with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
+            server.starttls(context=context)
             server.login(smtp_user, smtp_pass)
             server.send_message(msg)
         
@@ -93,7 +97,7 @@ def solicitar_2fa():
                 return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
                 
             cursor = conn.cursor()
-            cursor.execute("SELECT correo FROM Usuarios WHERE username = ?", (username,))
+            cursor.execute("SELECT correo FROM Usuarios WHERE username = %s", (username,))
             row = cursor.fetchone()
             
             if not row:
@@ -199,12 +203,12 @@ def registro():
             cursor = conn.cursor()
             
             # Verificar si el usuario ya existe
-            cursor.execute("SELECT id FROM Usuarios WHERE username = ?", (username,))
+            cursor.execute("SELECT id FROM Usuarios WHERE username = %s", (username,))
             if cursor.fetchone():
                 return jsonify({"error": "El nombre de usuario ya está en uso"}), 400
             
             # Verificar si el correo ya existe
-            cursor.execute("SELECT id FROM Usuarios WHERE correo = ?", (correo,))
+            cursor.execute("SELECT id FROM Usuarios WHERE correo = %s", (correo,))
             if cursor.fetchone():
                 return jsonify({"error": "El correo electrónico ya está registrado"}), 400
             
@@ -216,7 +220,7 @@ def registro():
             cursor.execute(
                 """
                 INSERT INTO Usuarios (nombre, username, password, correo, nuevo)
-                VALUES (?, ?, ?, ?, 1)
+                VALUES (%s, %s, %s, %s, 1)
                 """,
                 (nombre, username, hashed_password, correo)
             )

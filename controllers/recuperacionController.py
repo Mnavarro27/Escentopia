@@ -6,6 +6,7 @@ import datetime
 import ssl
 import smtplib
 import bcrypt
+import pytds
 import traceback
 from email.message import EmailMessage
 
@@ -15,25 +16,26 @@ recuperacion_bp = Blueprint('recuperacion', __name__)
 recovery_tokens = {}
 
 def get_db_connection():
-    """Obtiene una conexión a la base de datos"""
+    """Obtiene una conexión a la base de datos usando pytds"""
     try:
-        # Importamos la función aquí para evitar importación circular
-        import pyodbc
-        
         server = os.getenv('DB_SERVER')
+        port = int(os.getenv('DB_PORT', '1433'))
         database = os.getenv('DB_NAME')
-        username = os.getenv('DB_USER')
+        user = os.getenv('DB_USER')
         password = os.getenv('DB_PASS')
-        
-        conn_str = (
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={server};"
-            f"DATABASE={database};"
-            f"UID={username};"
-            f"PWD={password}"
+        cafile = '/etc/ssl/certs/ca-certificates.crt'
+
+        return pytds.connect(
+            server=server,
+            port=port,
+            database=database,
+            user=user,
+            password=password,
+            timeout=30,
+            tds_version=1946157060,
+            cafile=cafile,
+            validate_host=False
         )
-        
-        return pyodbc.connect(conn_str)
     except Exception as e:
         print(f"Error de conexión a la base de datos: {e}")
         traceback.print_exc()
@@ -57,7 +59,7 @@ def enviar_token():
                 return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
                 
             cursor = conn.cursor()
-            cursor.execute("SELECT id, nombre FROM Usuarios WHERE username = ? AND correo = ?", (username, email))
+            cursor.execute("SELECT id, nombre FROM Usuarios WHERE username = %s AND correo = %s", (username, email))
             row = cursor.fetchone()
             
             if not row:
@@ -120,14 +122,14 @@ def enviar_token():
         msg.set_content(f"Tu código de recuperación para Escentopia es: {token}\nEste código expirará en 10 minutos.")
         msg.add_alternative(html_content, subtype='html')
         msg['Subject'] = "Recuperación de contraseña - Escentopia"
-        msg['From'] = os.getenv("SMTP_USER")
+        msg['From'] = os.getenv("EMAIL_USER")
         msg['To'] = email
 
         # Enviar el correo
         smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
         smtp_port = int(os.getenv('SMTP_PORT', 587))
-        smtp_user = os.getenv('SMTP_USER')
-        smtp_pass = os.getenv('SMTP_PASS')
+        smtp_user = os.getenv('EMAIL_USER')
+        smtp_pass = os.getenv('EMAIL_PASS')
         
         # Verificar que tenemos las credenciales
         if not smtp_user or not smtp_pass:
@@ -135,8 +137,9 @@ def enviar_token():
             return jsonify({"error": "Error en la configuración del servidor de correo"}), 500
         
         # Enviar correo
+        context = ssl.create_default_context()
         with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
+            server.starttls(context=context)
             server.login(smtp_user, smtp_pass)
             server.send_message(msg)
 
@@ -221,7 +224,7 @@ def verificar_pregunta():
             
             # Consultar la pregunta y respuesta del usuario
             cursor.execute(
-                "SELECT preguntaSeguridad, respuestaSeguridad FROM Usuarios WHERE username = ?", (username,)
+                "SELECT preguntaSeguridad, respuestaSeguridad FROM Usuarios WHERE username = %s", (username,)
             )
             
             row = cursor.fetchone()
@@ -270,12 +273,12 @@ def cambiar_contrasena():
             cursor = conn.cursor()
             
             # Intentar primero por username
-            cursor.execute("SELECT id FROM Usuarios WHERE username = ?", (identificador,))
+            cursor.execute("SELECT id FROM Usuarios WHERE username = %s", (identificador,))
             row = cursor.fetchone()
             
             # Si no se encuentra, intentar por email
             if not row:
-                cursor.execute("SELECT id FROM Usuarios WHERE correo = ?", (identificador,))
+                cursor.execute("SELECT id FROM Usuarios WHERE correo = %s", (identificador,))
                 row = cursor.fetchone()
             
             if not row:
@@ -288,7 +291,7 @@ def cambiar_contrasena():
             
             # Actualizar la contraseña
             cursor.execute(
-                "UPDATE Usuarios SET password = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?",
+                "UPDATE Usuarios SET password = %s, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = %s",
                 (hashed_password, user_id)
             )
             conn.commit()
