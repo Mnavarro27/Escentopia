@@ -117,14 +117,19 @@ def solicitar_2fa():
         # Enviar correo con código
         asunto = "Código de verificación Escentopia"
         contenido = f"""
-        Hola {username},
-        
-        Tu código de verificación para Escentopia es: {codigo}
-        
-        Este código expirará en 10 minutos.
-        
-        Saludos,
-        Equipo Escentopia
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }}
+                .content {{ background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; }}
+                .code {{ font-size: 32px; font-weight: bold; color: #4CAF50; letter-spacing: 5px; text-align: center; margin: 20px 0; }}
+                .footer {{ margin-top: 20px; font-size: 12px; color: #777; text-align: center; }}
+                .note {{ background-color: #fff8e1; padding: 10px; border-left: 4px solid #ffc107; margin: 15px 0; }}
+            </style>
+        </head>
         """
         
         if enviar_correo(correo, asunto, contenido):
