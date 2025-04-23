@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // 📌 1️⃣ Enviar código al correo
+  // Enviar código al correo
   if (enviarBtn) {
     enviarBtn.addEventListener("click", async () => {
       const username = document.getElementById("username-email").value.trim()
@@ -69,11 +69,21 @@ document.addEventListener("DOMContentLoaded", () => {
       enviarBtn.style.backgroundColor = "#999"
 
       try {
-        const response = await fetch("/api/recuperacion/enviar-token", {
+        // Primero intentamos con la ruta API
+        let response = await fetch("/api/recuperacion/enviar-token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, email }),
         })
+
+        if (!response.ok) {
+          // Si falla, intentamos con la ruta directa
+          response = await fetch("/recuperacion/enviar-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email }),
+          })
+        }
 
         const data = await response.json()
 
@@ -105,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // 📌 2️⃣ Verificar el código antes de cambiar la contraseña
+  // Verificar el código antes de cambiar la contraseña
   if (verificarCodigoBtn) {
     verificarCodigoBtn.addEventListener("click", async () => {
       const username = localStorage.getItem("recovery_username")
@@ -125,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarMensaje("El código debe tener 6 dígitos.")
         return
       }
-      
 
       // Mostrar estado de carga
       verificarCodigoBtn.disabled = true
@@ -133,11 +142,21 @@ document.addEventListener("DOMContentLoaded", () => {
       verificarCodigoBtn.style.backgroundColor = "#999"
 
       try {
-        const response = await fetch("/api/recuperacion/verificar-token", {
+        // Primero intentamos con la ruta API
+        let response = await fetch("/api/recuperacion/verificar-token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, codigo }),
         })
+
+        if (!response.ok) {
+          // Si falla, intentamos con la ruta directa
+          response = await fetch("/recuperacion/verificar-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, codigo }),
+          })
+        }
 
         const data = await response.json()
 
@@ -166,61 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
         verificarCodigoBtn.disabled = false
         verificarCodigoBtn.textContent = "Verificar Código"
         verificarCodigoBtn.style.backgroundColor = ""
-      }
-    })
-  }
-
-  // 📌 3️⃣ Verificar pregunta de seguridad
-  if (verificarPreguntaBtn) {
-    verificarPreguntaBtn.addEventListener("click", async () => {
-      const username = document.getElementById("username").value.trim()
-      const pregunta = document.getElementById("preguntaSeguridad").value
-      const respuesta = document.getElementById("respuestaSeguridad").value.trim()
-
-      if (!username || !pregunta || !respuesta) {
-        mostrarMensaje("Por favor, completa todos los campos.")
-        return
-      }
-
-      // Mostrar estado de carga
-      verificarPreguntaBtn.disabled = true
-      verificarPreguntaBtn.textContent = "Verificando..."
-      verificarPreguntaBtn.style.backgroundColor = "#999"
-
-      try {
-        const response = await fetch("/api/recuperacion/verificar-pregunta", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, pregunta, respuesta }),
-        })
-
-        const data = await response.json()
-
-        if (response.ok && data.success) {
-          // Mostrar mensaje de éxito
-          successPreguntaEl.textContent = "Verificación exitosa. Redirigiendo..."
-          successPreguntaEl.style.display = "block"
-
-          // Esperar un momento para mostrar el mensaje
-          setTimeout(() => {
-            window.location.href = `cambiar-contrasena.html?username=${encodeURIComponent(username)}`
-          }, 1500)
-        } else {
-          mostrarMensaje(data.error || "Respuesta incorrecta.")
-
-          // Restaurar el botón
-          verificarPreguntaBtn.disabled = false
-          verificarPreguntaBtn.textContent = "Verificar"
-          verificarPreguntaBtn.style.backgroundColor = ""
-        }
-      } catch (error) {
-        console.error("Error en la validación:", error)
-        mostrarMensaje("Error de conexión con el servidor.")
-
-        // Restaurar el botón
-        verificarPreguntaBtn.disabled = false
-        verificarPreguntaBtn.textContent = "Verificar"
-        verificarPreguntaBtn.style.backgroundColor = ""
       }
     })
   }

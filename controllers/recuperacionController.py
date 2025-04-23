@@ -1,14 +1,43 @@
-from flask import Blueprint, request, jsonify
+# controllers/recuperacionController.py
+from flask import Blueprint, request, jsonify, current_app
 import os
 import random
 import datetime
 import ssl
 import smtplib
 import bcrypt
+import traceback
 from email.message import EmailMessage
-from flask import current_app as app
 
 recuperacion_bp = Blueprint('recuperacion', __name__)
+
+# Almacenamiento temporal de tokens de recuperación
+recovery_tokens = {}
+
+def get_db_connection():
+    """Obtiene una conexión a la base de datos"""
+    try:
+        # Importamos la función aquí para evitar importación circular
+        import pyodbc
+        
+        server = os.getenv('DB_SERVER')
+        database = os.getenv('DB_NAME')
+        username = os.getenv('DB_USER')
+        password = os.getenv('DB_PASS')
+        
+        conn_str = (
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server};"
+            f"DATABASE={database};"
+            f"UID={username};"
+            f"PWD={password}"
+        )
+        
+        return pyodbc.connect(conn_str)
+    except Exception as e:
+        print(f"Error de conexión a la base de datos: {e}")
+        traceback.print_exc()
+        return None
 
 @recuperacion_bp.route('/enviar-token', methods=['POST'])
 def enviar_token():
@@ -21,26 +50,30 @@ def enviar_token():
 
     try:
         # Buscar usuario en la base de datos
-        from app import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM Usuarios WHERE username = ? AND correo = ?", (username, email))
-        row = cursor.fetchone()
-        conn.close()
-
-        if not row:
-            return jsonify({"error": "No se encontró un usuario con ese nombre de usuario y correo electrónico"}), 404
-
-        user_id, nombre = row
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+                
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, nombre FROM Usuarios WHERE username = ? AND correo = ?", (username, email))
+            row = cursor.fetchone()
+            
+            if not row:
+                return jsonify({"error": "No se encontró un usuario con ese nombre de usuario y correo electrónico"}), 404
+            
+            user_id, nombre = row
+        finally:
+            if conn:
+                conn.close()
 
         # Generar token de recuperación
-        token = str(random.randint(100000, 999999))
+        token = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         expiracion = datetime.datetime.now() + datetime.timedelta(minutes=10)
 
-        # Guardarlo en la memoria temporal de Flask
-        if 'RECOVERY_TOKENS' not in app.config:
-            app.config['RECOVERY_TOKENS'] = {}
-        app.config['RECOVERY_TOKENS'][username] = (token, expiracion)
+        # Guardarlo en la memoria temporal
+        recovery_tokens[username] = (token, expiracion)
 
         # Enviar correo con el token
         msg = EmailMessage()
@@ -87,18 +120,31 @@ def enviar_token():
         msg.set_content(f"Tu código de recuperación para Escentopia es: {token}\nEste código expirará en 10 minutos.")
         msg.add_alternative(html_content, subtype='html')
         msg['Subject'] = "Recuperación de contraseña - Escentopia"
-        msg['From'] = os.getenv("EMAIL_USER")
+        msg['From'] = os.getenv("SMTP_USER")
         msg['To'] = email
 
         # Enviar el correo
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
-            server.login(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASS"))
+        smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+        smtp_port = int(os.getenv('SMTP_PORT', 587))
+        smtp_user = os.getenv('SMTP_USER')
+        smtp_pass = os.getenv('SMTP_PASS')
+        
+        # Verificar que tenemos las credenciales
+        if not smtp_user or not smtp_pass:
+            print("Error: Faltan credenciales SMTP en variables de entorno")
+            return jsonify({"error": "Error en la configuración del servidor de correo"}), 500
+        
+        # Enviar correo
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
             server.send_message(msg)
 
-        return jsonify({"message": "Código enviado al correo electrónico"}), 200
+        return jsonify({"success": True, "message": "Código enviado al correo electrónico"}), 200
 
     except Exception as e:
         print("Error enviando token:", e)
+        traceback.print_exc()
         return jsonify({"error": "No se pudo enviar el código de recuperación"}), 500
 
 @recuperacion_bp.route('/verificar-token', methods=['POST'])
@@ -111,7 +157,7 @@ def verificar_token():
         return jsonify({"error": "Faltan datos requeridos"}), 400
     
     # Verificar si hay un token para este usuario
-    entry = app.config.get('RECOVERY_TOKENS', {}).get(username)
+    entry = recovery_tokens.get(username)
     if not entry:
         return jsonify({"error": "No se ha solicitado recuperación para este usuario"}), 400
     
@@ -119,7 +165,7 @@ def verificar_token():
     
     # Verificar si el token ha expirado
     if datetime.datetime.now() > exp:
-        del app.config['RECOVERY_TOKENS'][username]
+        del recovery_tokens[username]
         return jsonify({"error": "El código ha expirado. Por favor, solicita uno nuevo."}), 400
     
     # Verificar si el token es correcto
@@ -127,7 +173,7 @@ def verificar_token():
         return jsonify({"error": "Código incorrecto"}), 401
     
     # Si todo está bien, eliminar la entrada y devolver éxito
-    del app.config['RECOVERY_TOKENS'][username]
+    del recovery_tokens[username]
     return jsonify({"success": True, "message": "Código verificado correctamente"})
 
 @recuperacion_bp.route('/verificar-pregunta', methods=['POST'])
@@ -137,65 +183,71 @@ def verificar_pregunta():
     pregunta = data.get('pregunta')
     respuesta = data.get('respuesta')
     
-    
     if not username or not pregunta or not respuesta:
         return jsonify({"error": "Faltan datos requeridos"}), 400
     
     try:
         # Buscar usuario y verificar pregunta de seguridad
-        from app import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Verificar si la tabla tiene las columnas de pregunta y respuesta
-        cursor.execute("""
-            SELECT COUNT(*) 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = 'Usuarios' AND COLUMN_NAME = 'preguntaSeguridad'
-        """)
-        
-        pregunta_exists = cursor.fetchone()[0] > 0
-        
-        if not pregunta_exists:
-            # Si no existe, intentar crearla
-            try:
-                cursor.execute(
-                    "ALTER TABLE Usuarios ADD preguntaSeguridad NVARCHAR(255)"
-                )
-                cursor.execute(
-                    "ALTER TABLE Usuarios ADD respuestaSeguridad NVARCHAR(255)"
-                )
-                conn.commit()
-            except Exception as e:
-                print("Error al crear columnas de seguridad:", e)
-                return jsonify({"error": "No se pudo verificar la pregunta de seguridad"}), 500
-        
-        # Consultar la pregunta y respuesta del usuario
-        cursor.execute(
-            "SELECT preguntaSeguridad, respuestaSeguridad FROM Usuarios WHERE username = ?", (username,)
-        )
-        
-        row = cursor.fetchone()
-        conn.close()
-        
-        if not row or not row[0] or not row[1]:
-            return jsonify({"error": "No se encontró información de seguridad para este usuario"}), 404
-        
-        stored_pregunta, stored_respuesta = row
-        
-        # Verificar que la pregunta coincida
-        if pregunta != stored_pregunta:
-            return jsonify({"error": "La pregunta de seguridad no coincide"}), 401
-        
-        # Verificar que la respuesta coincida (sin distinguir mayúsculas/minúsculas)
-        if respuesta.lower() != stored_respuesta.lower():
-            return jsonify({"error": "Respuesta incorrecta"}), 401
-        
-        # Si todo está bien, devolver éxito
-        return jsonify({"success": True, "message": "Verificación exitosa"})
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+                
+            cursor = conn.cursor()
+            
+            # Verificar si la tabla tiene las columnas de pregunta y respuesta
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'Usuarios' AND COLUMN_NAME = 'preguntaSeguridad'
+            """)
+            
+            pregunta_exists = cursor.fetchone()[0] > 0
+            
+            if not pregunta_exists:
+                # Si no existe, intentar crearla
+                try:
+                    cursor.execute(
+                        "ALTER TABLE Usuarios ADD preguntaSeguridad NVARCHAR(255)"
+                    )
+                    cursor.execute(
+                        "ALTER TABLE Usuarios ADD respuestaSeguridad NVARCHAR(255)"
+                    )
+                    conn.commit()
+                except Exception as e:
+                    print("Error al crear columnas de seguridad:", e)
+                    return jsonify({"error": "No se pudo verificar la pregunta de seguridad"}), 500
+            
+            # Consultar la pregunta y respuesta del usuario
+            cursor.execute(
+                "SELECT preguntaSeguridad, respuestaSeguridad FROM Usuarios WHERE username = ?", (username,)
+            )
+            
+            row = cursor.fetchone()
+            
+            if not row or not row[0] or not row[1]:
+                return jsonify({"error": "No se encontró información de seguridad para este usuario"}), 404
+            
+            stored_pregunta, stored_respuesta = row
+            
+            # Verificar que la pregunta coincida
+            if pregunta != stored_pregunta:
+                return jsonify({"error": "La pregunta de seguridad no coincide"}), 401
+            
+            # Verificar que la respuesta coincida (sin distinguir mayúsculas/minúsculas)
+            if respuesta.lower() != stored_respuesta.lower():
+                return jsonify({"error": "Respuesta incorrecta"}), 401
+            
+            # Si todo está bien, devolver éxito
+            return jsonify({"success": True, "message": "Verificación exitosa"})
+        finally:
+            if conn:
+                conn.close()
         
     except Exception as e:
         print("Error verificando pregunta:", e)
+        traceback.print_exc()
         return jsonify({"error": "No se pudo verificar la pregunta de seguridad"}), 500
 
 @recuperacion_bp.route('/cambiar-contrasena', methods=['POST'])
@@ -209,38 +261,44 @@ def cambiar_contrasena():
     
     try:
         # Buscar usuario por username o email
-        from app import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Intentar primero por username
-        cursor.execute("SELECT id FROM Usuarios WHERE username = ?", (identificador,))
-        row = cursor.fetchone()
-        
-        # Si no se encuentra, intentar por email
-        if not row:
-            cursor.execute("SELECT id FROM Usuarios WHERE correo = ?", (identificador,))
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+                
+            cursor = conn.cursor()
+            
+            # Intentar primero por username
+            cursor.execute("SELECT id FROM Usuarios WHERE username = ?", (identificador,))
             row = cursor.fetchone()
-        
-        if not row:
-            conn.close()
-            return jsonify({"error": "No se encontró el usuario"}), 404
-        
-        user_id = row[0]
-        
-        # Hashear la nueva contraseña
-        hashed_password = bcrypt.hashpw(nueva_password.encode(), bcrypt.gensalt()).decode()
-        
-        # Actualizar la contraseña
-        cursor.execute(
-            "UPDATE Usuarios SET password = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?",
-            (hashed_password, user_id)
-        )
-        conn.commit()
-        conn.close()
-        
-        return jsonify({"success": True, "message": "Contraseña actualizada correctamente"})
+            
+            # Si no se encuentra, intentar por email
+            if not row:
+                cursor.execute("SELECT id FROM Usuarios WHERE correo = ?", (identificador,))
+                row = cursor.fetchone()
+            
+            if not row:
+                return jsonify({"error": "No se encontró el usuario"}), 404
+            
+            user_id = row[0]
+            
+            # Hashear la nueva contraseña
+            hashed_password = bcrypt.hashpw(nueva_password.encode(), bcrypt.gensalt()).decode()
+            
+            # Actualizar la contraseña
+            cursor.execute(
+                "UPDATE Usuarios SET password = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?",
+                (hashed_password, user_id)
+            )
+            conn.commit()
+            
+            return jsonify({"success": True, "message": "Contraseña actualizada correctamente"})
+        finally:
+            if conn:
+                conn.close()
         
     except Exception as e:
         print("Error cambiando contraseña:", e)
+        traceback.print_exc()
         return jsonify({"error": "No se pudo actualizar la contraseña"}), 500

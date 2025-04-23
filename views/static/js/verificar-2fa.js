@@ -44,15 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarError("Por favor, ingresa el código completo de 6 dígitos.")
       return
     }
-    
 
     // Mostrar estado de carga
     const textoOriginal = verificarBtn.textContent
     verificarBtn.innerHTML = '<span class="loading"></span> Verificando...'
     verificarBtn.disabled = true
 
-    // Enviar solicitud al servidor
-    fetch("/verificar-2fa", {
+    // Primero intentamos con la ruta API
+    fetch("/api/autenticacion/verificar-2fa", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,6 +61,22 @@ document.addEventListener("DOMContentLoaded", () => {
         codigo2FA: codigo,
       }),
     })
+      .then((response) => {
+        if (!response.ok) {
+          // Si falla, intentamos con la ruta directa
+          return fetch("/verificar-2fa", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: username,
+              codigo2FA: codigo,
+            }),
+          })
+        }
+        return response
+      })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {

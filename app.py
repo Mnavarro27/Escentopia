@@ -115,6 +115,7 @@ def log_audit(username, ip, success, reason):
 # ─── Endpoints de API ──────────────────────────────────────────────────────────
 
 # Rutas para 2FA (compatibilidad)
+
 @app.route('/solicitar-2fa', methods=['POST'])
 def solicitar_2fa_compat():
     from controllers.autenticacionController import solicitar_2fa
@@ -124,6 +125,33 @@ def solicitar_2fa_compat():
 def verificar_2fa_compat():
     from controllers.autenticacionController import verificar_2fa
     return verificar_2fa()
+
+@app.route('/registro', methods=['POST'])
+def registro_compat():
+    from controllers.autenticacionController import registro
+    return registro()
+
+
+# Rutas para recuperación (compatibilidad)
+@app.route('/recuperacion/enviar-token', methods=['POST'])
+def enviar_token_compat():
+    from controllers.recuperacionController import enviar_token
+    return enviar_token()
+
+@app.route('/recuperacion/verificar-token', methods=['POST'])
+def verificar_token_compat():
+    from controllers.recuperacionController import verificar_token
+    return verificar_token()
+
+@app.route('/recuperacion/verificar-pregunta', methods=['POST'])
+def verificar_pregunta_compat():
+    from controllers.recuperacionController import verificar_pregunta
+    return verificar_pregunta()
+
+@app.route('/recuperacion/cambiar-contrasena', methods=['POST'])
+def cambiar_contrasena_compat():
+    from controllers.recuperacionController import cambiar_contrasena
+    return cambiar_contrasena()
 
 # Productos
 @app.route('/productos', methods=['GET'])

@@ -1,10 +1,12 @@
 # controllers/autenticacionController.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_cors import CORS
 import random
 import smtplib
 from email.message import EmailMessage
 import os
+import sys
+import traceback
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,9 +18,29 @@ CORS(autenticacion_bp)
 codigos_2fa = {}
 
 def get_db_connection():
-    # Importar la función desde app.py para evitar importación circular
-    from app import get_db_connection as app_get_db
-    return app_get_db()
+    """Obtiene una conexión a la base de datos"""
+    try:
+        # Importamos la función aquí para evitar importación circular
+        import pyodbc
+        
+        server = os.getenv('DB_SERVER')
+        database = os.getenv('DB_NAME')
+        username = os.getenv('DB_USER')
+        password = os.getenv('DB_PASS')
+        
+        conn_str = (
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server};"
+            f"DATABASE={database};"
+            f"UID={username};"
+            f"PWD={password}"
+        )
+        
+        return pyodbc.connect(conn_str)
+    except Exception as e:
+        print(f"Error de conexión a la base de datos: {e}")
+        traceback.print_exc()
+        return None
 
 def enviar_correo(destinatario, asunto, contenido):
     """Envía un correo electrónico usando SMTP"""
@@ -28,6 +50,11 @@ def enviar_correo(destinatario, asunto, contenido):
         smtp_port = int(os.getenv('SMTP_PORT', 587))
         smtp_user = os.getenv('SMTP_USER')
         smtp_pass = os.getenv('SMTP_PASS')
+        
+        # Verificar que tenemos las credenciales
+        if not smtp_user or not smtp_pass:
+            print("Error: Faltan credenciales SMTP en variables de entorno")
+            return False
         
         # Crear mensaje
         msg = EmailMessage()
@@ -45,6 +72,7 @@ def enviar_correo(destinatario, asunto, contenido):
         return True
     except Exception as e:
         print(f"Error al enviar correo: {e}")
+        traceback.print_exc()
         return False
 
 @autenticacion_bp.route('/solicitar-2fa', methods=['POST'])
@@ -58,16 +86,23 @@ def solicitar_2fa():
     
     try:
         # Obtener correo del usuario
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT correo FROM Usuarios WHERE username = %s", (username,))
-        row = cursor.fetchone()
-        conn.close()
-        
-        if not row:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-        
-        correo = row[0]
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+                
+            cursor = conn.cursor()
+            cursor.execute("SELECT correo FROM Usuarios WHERE username = ?", (username,))
+            row = cursor.fetchone()
+            
+            if not row:
+                return jsonify({"error": "Usuario no encontrado"}), 404
+            
+            correo = row[0]
+        finally:
+            if conn:
+                conn.close()
         
         # Generar código 2FA (6 dígitos)
         codigo = ''.join([str(random.randint(0, 9)) for _ in range(6)])
@@ -95,6 +130,7 @@ def solicitar_2fa():
     
     except Exception as e:
         print(f"Error en solicitar-2fa: {e}")
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @autenticacion_bp.route('/verificar-2fa', methods=['POST'])
@@ -119,3 +155,78 @@ def verificar_2fa():
     del codigos_2fa[username]
     
     return jsonify({"success": True, "message": "Verificación exitosa"}), 200
+
+@autenticacion_bp.route('/registro', methods=['POST'])
+def registro():
+    """Registra un nuevo usuario en el sistema"""
+    data = request.json
+    nombre = data.get('nombre')
+    username = data.get('username')
+    password = data.get('password')
+    correo = data.get('correo')
+    
+    if not nombre or not username or not password or not correo:
+        return jsonify({"error": "Todos los campos son obligatorios"}), 400
+    
+    # Validar formato de correo
+    import re
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", correo):
+        return jsonify({"error": "Formato de correo electrónico inválido"}), 400
+    
+    # Validar contraseña
+    if len(password) < 8:
+        return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
+    
+    if not re.search(r"[A-Z]", password):
+        return jsonify({"error": "La contraseña debe tener al menos una letra mayúscula"}), 400
+    
+    if not re.search(r"[a-z]", password):
+        return jsonify({"error": "La contraseña debe tener al menos una letra minúscula"}), 400
+    
+    if not re.search(r"\d", password):
+        return jsonify({"error": "La contraseña debe tener al menos un número"}), 400
+    
+    if not re.search(r"[@$!%*?&+\-.:;,¿]", password):
+        return jsonify({"error": "La contraseña debe tener al menos un carácter especial"}), 400
+    
+    try:
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+                
+            cursor = conn.cursor()
+            
+            # Verificar si el usuario ya existe
+            cursor.execute("SELECT id FROM Usuarios WHERE username = ?", (username,))
+            if cursor.fetchone():
+                return jsonify({"error": "El nombre de usuario ya está en uso"}), 400
+            
+            # Verificar si el correo ya existe
+            cursor.execute("SELECT id FROM Usuarios WHERE correo = ?", (correo,))
+            if cursor.fetchone():
+                return jsonify({"error": "El correo electrónico ya está registrado"}), 400
+            
+            # Hashear la contraseña
+            import bcrypt
+            hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            
+            # Insertar el nuevo usuario
+            cursor.execute(
+                """
+                INSERT INTO Usuarios (nombre, username, password, correo, nuevo)
+                VALUES (?, ?, ?, ?, 1)
+                """,
+                (nombre, username, hashed_password, correo)
+            )
+            conn.commit()
+            
+            return jsonify({"success": True, "message": "Usuario registrado correctamente"}), 201
+        finally:
+            if conn:
+                conn.close()
+    except Exception as e:
+        print(f"Error en registro: {e}")
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
