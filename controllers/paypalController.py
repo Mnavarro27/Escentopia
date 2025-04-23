@@ -71,8 +71,8 @@ def create_payment():
             "description": "Compra en Escentopia"
         }],
         "redirect_urls": {
-            "return_url": "http://localhost:5000/finCompra",
-            "cancel_url": "http://localhost:5000/finCompra"
+            "return_url": "/finCompra",
+            "cancel_url": "/finCompra"
         }
     }
 

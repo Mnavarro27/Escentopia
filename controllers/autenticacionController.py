@@ -130,6 +130,27 @@ def solicitar_2fa():
                 .note {{ background-color: #fff8e1; padding: 10px; border-left: 4px solid #ffc107; margin: 15px 0; }}
             </style>
         </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Codigo de verificacion</h1>
+                </div>
+                <div class="content">
+                    <p>Bienvenido a Escentopia,</p>
+                    <p>Recibimos una solicitud para iniciar sesión en Escentopia. Utiliza el siguiente código para continuar con el proceso:</p>
+                    <div class="code">{username}</div>
+                    <p>Este código expirará en 10 minutos por razones de seguridad.</p>
+                    <div class="note">
+                        <p><strong>Nota de seguridad:</strong> Si no solicitaste iniciar sesión, alguien podría estar intentando acceder a tu cuenta. Te recomendamos ignorar este mensaje y verificar la seguridad de tu cuenta.</p>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>© 2023 Escentopia. Todos los derechos reservados.</p>
+                    <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+                </div>
+            </div>
+        </body>
+        </html>
         """
         
         if enviar_correo(correo, asunto, contenido):

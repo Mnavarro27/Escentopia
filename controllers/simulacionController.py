@@ -1,20 +1,45 @@
 # controllers/simulacionController.py
-import pyodbc
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_cors import CORS
 from decimal import Decimal
+import random,pyodbc
+import smtplib
+import pytds
+import ssl
+from email.message import EmailMessage
+import os
+import sys
+import traceback
+from dotenv import load_dotenv
 
 simulacion_bp = Blueprint('simulacion', __name__)
 CORS(simulacion_bp)
 
-def get_connection():
-    return pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};"
-        "SERVER=localhost;"
-        "DATABASE=simulacionesApi;"
-        "UID=sa;"
-        "PWD=AdminM27"
-    )
+def get_db_connection():
+    """Obtiene una conexión a la base de datos usando pytds"""
+    try:
+        server = os.getenv('DB_SERVER')
+        port = int(os.getenv('DB_PORT', '1433'))
+        database = os.getenv('DB_NAME')
+        user = os.getenv('DB_USER')
+        password = os.getenv('DB_PASS')
+        cafile = '/etc/ssl/certs/ca-certificates.crt'
+
+        return pytds.connect(
+            server=server,
+            port=port,
+            database=database,
+            user=user,
+            password=password,
+            timeout=30,
+            tds_version=1946157060,
+            cafile=cafile,
+            validate_host=False
+        )
+    except Exception as e:
+        print(f"Error de conexión a la base de datos: {e}")
+        traceback.print_exc()
+        return None
 
 # controllers/simulacionController.py
 @simulacion_bp.route("/validar-pago", methods=["POST"])
@@ -30,7 +55,7 @@ def validar_pago():
         return jsonify({"error": "Faltan datos"}), 400
 
     try:
-        conn = get_connection()
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -67,7 +92,7 @@ def validar_pago():
 @simulacion_bp.route("/tarjetas", methods=["GET"])
 def obtener_tarjetas():
     try:
-        conn = get_connection()
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 'activa'")
         tarjetas = []
