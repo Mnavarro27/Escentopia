@@ -6,6 +6,27 @@ function getUrlParameter(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
   }
   
+  // Función para formatear fecha de vencimiento
+  function formatearFechaVencimiento(fecha) {
+    // Si la fecha ya está en formato MM/YYYY, devolverla tal cual
+    if (typeof fecha === "string" && /^\d{2}\/\d{4}$/.test(fecha)) {
+      return fecha
+    }
+  
+    // Si es una fecha completa, convertirla a MM/YYYY
+    try {
+      const fechaObj = new Date(fecha)
+      if (!isNaN(fechaObj.getTime())) {
+        return `${String(fechaObj.getMonth() + 1).padStart(2, "0")}/${fechaObj.getFullYear()}`
+      }
+    } catch (e) {
+      console.error("Error al formatear fecha:", e)
+    }
+  
+    // Si no se pudo formatear, devolver la fecha original
+    return fecha
+  }
+  
   // Función para cargar tarjetas disponibles
   async function cargarTarjetas() {
     try {
@@ -26,10 +47,13 @@ function getUrlParameter(name) {
   
       // Agregar tarjetas al select
       tarjetas.forEach((tarjeta) => {
+        // Formatear la fecha de vencimiento si es necesario
+        const fechaFormateada = formatearFechaVencimiento(tarjeta.fecha_vencimiento)
+  
         const option = document.createElement("option")
         option.value = JSON.stringify({
           numero: tarjeta.numero_tarjeta,
-          fecha: tarjeta.fecha_vencimiento,
+          fecha: fechaFormateada,
           propietario: tarjeta.propietario,
         })
         option.textContent = `${tarjeta.propietario} (${tarjeta.numero_tarjeta})`
@@ -77,10 +101,20 @@ function getUrlParameter(name) {
     try {
       const tarjeta = JSON.parse(selectedValue)
   
+      // Formatear la fecha de vencimiento si es necesario
+      const fechaFormateada = formatearFechaVencimiento(tarjeta.fecha)
+  
       // Deshabilitar botón mientras se procesa
       const payBtn = document.getElementById("payWithCardBtn")
       payBtn.disabled = true
       payBtn.textContent = "Procesando..."
+  
+      // Mostrar datos que se enviarán (para depuración)
+      console.log("Enviando datos de pago:", {
+        numero: tarjeta.numero,
+        fecha_vencimiento: fechaFormateada,
+        monto: totalAmount,
+      })
   
       // Enviar solicitud de pago
       const response = await fetch("/api/simulacion/validar-pago", {
@@ -90,12 +124,13 @@ function getUrlParameter(name) {
         },
         body: JSON.stringify({
           numero: tarjeta.numero,
-          fecha_vencimiento: tarjeta.fecha,
+          fecha_vencimiento: fechaFormateada,
           monto: totalAmount,
         }),
       })
   
       const data = await response.json()
+      console.log("Respuesta del servidor:", data)
   
       // Habilitar botón nuevamente
       payBtn.disabled = false

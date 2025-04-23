@@ -11,6 +11,7 @@ import os
 import sys
 import traceback
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 
@@ -57,9 +58,14 @@ def obtener_tarjetas():
         cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 1")
         tarjetas = []
         for row in cursor.fetchall():
+            # Formatear la fecha para que sea más simple
+            fecha_vencimiento = row[1]
+            if isinstance(fecha_vencimiento, datetime.datetime):
+                fecha_vencimiento = fecha_vencimiento.strftime('%m/%Y')
+            
             tarjetas.append({
                 "numero_tarjeta": row[0],
-                "fecha_vencimiento": row[1],
+                "fecha_vencimiento": fecha_vencimiento,
                 "propietario": row[2]
             })
         return jsonify(tarjetas)
@@ -83,6 +89,31 @@ def validar_pago():
     if not numero or not fecha_vencimiento or not monto:
         return jsonify({"error": "Faltan datos"}), 400
 
+    # Procesar la fecha de vencimiento si viene en formato GMT
+    try:
+        if isinstance(fecha_vencimiento, str) and "GMT" in fecha_vencimiento:
+            # Intentar parsear la fecha completa
+            try:
+                # Formato: "Mon, 01 Nov 2027 00:00:00 GMT"
+                fecha_dt = datetime.datetime.strptime(fecha_vencimiento, "%a, %d %b %Y %H:%M:%S GMT")
+                fecha_vencimiento = fecha_dt.strftime('%m/%Y')
+            except ValueError:
+                # Si falla, intentar extraer mes y año con un enfoque más simple
+                import re
+                match = re.search(r'\d{2} (\w{3}) (\d{4})', fecha_vencimiento)
+                if match:
+                    mes = match.group(1)
+                    año = match.group(2)
+                    # Convertir mes de texto a número
+                    meses = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", 
+                             "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
+                    fecha_vencimiento = f"{meses.get(mes, '01')}/{año}"
+    except Exception as e:
+        print(f"Error al procesar fecha: {e}")
+        # Si hay error, mantener la fecha original
+
+    print(f"Fecha procesada: {fecha_vencimiento}")
+
     conn = None
     try:
         conn = get_db_connection()
@@ -90,11 +121,15 @@ def validar_pago():
             return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
             
         cursor = conn.cursor()
-        # Modificar la consulta para usar BIT en lugar de 'activa'
+        
+        # Consulta más flexible para la fecha de vencimiento
         cursor.execute("""
             SELECT saldo, estado FROM tarjeta 
-            WHERE numero_tarjeta = %s AND fecha_vencimiento = %s
-        """, (numero, fecha_vencimiento))
+            WHERE numero_tarjeta = %s AND 
+                  (fecha_vencimiento = %s OR 
+                   CONVERT(VARCHAR(7), fecha_vencimiento, 101) = %s OR
+                   CONVERT(VARCHAR(7), fecha_vencimiento, 110) = %s)
+        """, (numero, fecha_vencimiento, fecha_vencimiento, fecha_vencimiento))
 
         row = cursor.fetchone()
         if not row:
