@@ -51,8 +51,8 @@ def enviar_correo(destinatario, asunto, contenido, contenido_html=None):
         # Configuración del servidor SMTP
         smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
         smtp_port = int(os.getenv('SMTP_PORT', 587))
-        smtp_user = os.getenv('EMAIL_USER')  # Usar EMAIL_USER en lugar de SMTP_USER
-        smtp_pass = os.getenv('EMAIL_PASS')  # Usar EMAIL_PASS en lugar de SMTP_PASS
+        smtp_user = os.getenv('EMAIL_USER')
+        smtp_pass = os.getenv('EMAIL_PASS')
         
         # Verificar que tenemos las credenciales
         if not smtp_user or not smtp_pass:
@@ -254,13 +254,25 @@ def registro():
             import bcrypt
             hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
             
-            # Insertar el nuevo usuario con valores predeterminados para columnas no proporcionadas
+            # Insertar el nuevo usuario con valores predeterminados para todas las columnas
             cursor.execute(
                 """
-                INSERT INTO Usuarios (nombre, apellido, username, password, correo, telefono, tipo_identificacion, nuevo)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO Usuarios (
+                    nombre, apellido, tipo_identificacion, identificacion, fecha_nacimiento, sexo, 
+                    direccion, telefono, correo, username, password, nombre_tarjeta, numero_tarjeta, 
+                    fecha_vencimiento, codigo_seguridad, preguntaSeguridad, respuestaSeguridad, 
+                    intentos_fallidos, bloqueado_hasta, token_recuperacion, token_expiracion, 
+                    pais_id, provincia_id, canton_id, distrito_id, show_onboarding, nuevo
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
-                (nombre, '', username, hashed_password, correo, '', 'Nacional', 1)
+                (
+                    nombre, '', 'Nacional', '', '1900-01-01', 'No especificado', 
+                    '', '', correo, username, hashed_password, '', '', 
+                    '', '', '', '', 
+                    0, None, None, None, 
+                    1, 1, 1, 1, 1, 1
+                )
             )
             conn.commit()
             
