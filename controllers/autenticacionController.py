@@ -250,22 +250,17 @@ def registro():
             if cursor.fetchone():
                 return jsonify({"error": "El nombre de usuario ya está en uso"}), 400
             
-            # Verificar si el correo ya existe
-            cursor.execute("SELECT id FROM Usuarios WHERE correo = %s", (correo,))
-            if cursor.fetchone():
-                return jsonify({"error": "El correo electrónico ya está registrado"}), 400
-            
             # Hashear la contraseña
             import bcrypt
             hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
             
-            # Insertar el nuevo usuario
+            # Insertar el nuevo usuario con valores predeterminados para columnas no proporcionadas
             cursor.execute(
                 """
-                INSERT INTO Usuarios (nombre, username, password, correo, nuevo)
-                VALUES (%s, %s, %s, %s, 1)
+                INSERT INTO Usuarios (nombre, apellido, username, password, correo, telefono, nuevo)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (nombre, username, hashed_password, correo)
+                (nombre, '', username, hashed_password, correo, '', 1)
             )
             conn.commit()
             

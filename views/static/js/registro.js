@@ -48,21 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // Primero intentamos con la ruta API
-      let response = await fetch("/api/autenticacion/registro", {
+      // Enviar solicitud a la ruta API
+      const response = await fetch("/api/autenticacion/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       })
-
-      if (!response.ok) {
-        // Si falla, intentamos con la ruta directa
-        response = await fetch("/registro", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        })
-      }
 
       const data = await response.json()
 
