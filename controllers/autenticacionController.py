@@ -257,10 +257,10 @@ def registro():
             # Insertar el nuevo usuario con valores predeterminados para columnas no proporcionadas
             cursor.execute(
                 """
-                INSERT INTO Usuarios (nombre, apellido, username, password, correo, telefono, nuevo)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO Usuarios (nombre, apellido, username, password, correo, telefono, tipo_identificacion, nuevo)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
-                (nombre, '', username, hashed_password, correo, '', 1)
+                (nombre, '', username, hashed_password, correo, '', 'Nacional', 1)
             )
             conn.commit()
             

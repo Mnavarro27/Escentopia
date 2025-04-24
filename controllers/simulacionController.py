@@ -16,7 +16,6 @@ import re
 
 load_dotenv()
 
-# Crear el blueprint sin tilde en el nombre
 simulacion_bp = Blueprint('simulacion', __name__, url_prefix='/api/simulacion')
 CORS(simulacion_bp)
 
@@ -47,14 +46,23 @@ def get_db_connection():
         return None
 
 def parse_fecha_vencimiento(fecha):
-    """Convierte una fecha MM/YY a un objeto datetime para SQL Server"""
+    """Convierte una fecha MM/YY al primer día del mes siguiente en formato YYYY-MM-DD para SQL Server"""
     try:
         if isinstance(fecha, str) and re.match(r'^\d{2}/\d{2}$', fecha):
             mes, año = fecha.split('/')
             # Asumir que el año es 20XX (por ejemplo, 26 -> 2026)
             año_completo = f"20{año}"
-            # Crear una fecha con el primer día del mes
-            fecha_dt = datetime.datetime.strptime(f"{mes}/01/{año_completo}", "%m/%d/%Y")
+            # Convertir a número para cálculos
+            mes_num = int(mes)
+            año_num = int(año_completo)
+            # Sumar un mes para obtener el mes siguiente
+            if mes_num == 12:
+                mes_num = 1
+                año_num += 1
+            else:
+                mes_num += 1
+            # Crear una fecha con el primer día del mes siguiente
+            fecha_dt = datetime.datetime.strptime(f"{mes_num}/01/{año_num}", "%m/%d/%Y")
             return fecha_dt
         else:
             raise ValueError(f"Formato de fecha inválido: {fecha}")
@@ -71,7 +79,6 @@ def obtener_tarjetas():
             return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
             
         cursor = conn.cursor()
-        # Modificar la consulta para usar BIT en lugar de 'activa'
         cursor.execute("SELECT numero_tarjeta, fecha_vencimiento, propietario FROM tarjeta WHERE estado = 1")
         tarjetas = []
         for row in cursor.fetchall():
@@ -107,7 +114,7 @@ def validar_pago():
     try:
         # Convertir la fecha MM/YY a un objeto datetime
         fecha_dt = parse_fecha_vencimiento(fecha_vencimiento)
-        print(f"Fecha procesada: {fecha_dt}")
+        print(f"Fecha procesada: {fecha_dt}, Mes: {fecha_dt.month}, Año: {fecha_dt.year}")
 
         conn = get_db_connection()
         if not conn:
@@ -115,19 +122,30 @@ def validar_pago():
             
         cursor = conn.cursor()
         
-        # Consulta para buscar la tarjeta comparando mes y año
+        # Depuración: Verificar si la tarjeta existe
+        cursor.execute("SELECT numero_tarjeta, fecha_vencimiento FROM tarjeta WHERE numero_tarjeta = %s", (numero,))
+        tarjeta = cursor.fetchone()
+        if not tarjeta:
+            print(f"No se encontró tarjeta con número: {numero}")
+            return jsonify({"validacion": "rechazada", "motivo": "Tarjeta no encontrada"}), 404
+        
+        print(f"Tarjeta encontrada: Número: {tarjeta[0]}, Fecha en DB: {tarjeta[1]}")
+
+        # Consulta para buscar la tarjeta comparando la fecha completa
         cursor.execute("""
             SELECT saldo, estado FROM tarjeta 
             WHERE numero_tarjeta = %s AND 
-                  MONTH(fecha_vencimiento) = %s AND 
-                  YEAR(fecha_vencimiento) = %s
-        """, (numero, fecha_dt.month, fecha_dt.year))
+                  fecha_vencimiento = %s
+        """, (numero, fecha_dt.date()))
 
         row = cursor.fetchone()
         if not row:
-            return jsonify({"validacion": "rechazada", "motivo": "Tarjeta no encontrada"}), 404
+            print(f"No se encontró coincidencia para fecha: {fecha_dt.date()}")
+            return jsonify({"validacion": "rechazada", "motivo": "Fecha de vencimiento no coincide"}), 404
 
         saldo, estado = row
+        print(f"Saldo: {saldo}, Estado: {estado}")
+
         # Verificar el estado como BIT (1 = activa, 0 = inactiva)
         if estado != 1:
             return jsonify({"validacion": "rechazada", "motivo": "Tarjeta inactiva"}), 403
